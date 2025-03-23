@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class WaterbusApplication {
 
     public static void main(String[] args) {
+        System.out.println("App started");
         SpringApplication.run(WaterbusApplication.class, args);
     }
 
