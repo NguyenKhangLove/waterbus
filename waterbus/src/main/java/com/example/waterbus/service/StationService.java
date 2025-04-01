@@ -1,12 +1,10 @@
 package com.example.waterbus.service;
 
-import com.example.waterbus.dto.StationRequestDTO;
+import com.example.waterbus.dto.request.StationRequestDTO;
 import com.example.waterbus.entity.Station;
 import com.example.waterbus.exception.StationNotFoundException;
 import com.example.waterbus.repository.StationRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 
 import java.util.List;

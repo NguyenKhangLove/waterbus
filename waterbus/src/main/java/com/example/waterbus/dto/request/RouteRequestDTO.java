@@ -1,4 +1,4 @@
-package com.example.waterbus.dto;
+package com.example.waterbus.dto.request;
 
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;

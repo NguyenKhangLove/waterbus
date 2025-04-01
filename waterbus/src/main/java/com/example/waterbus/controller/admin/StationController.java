@@ -1,15 +1,11 @@
-package com.example.waterbus.controller;
+package com.example.waterbus.controller.admin;
 
-import com.example.waterbus.dto.StationRequestDTO;
+import com.example.waterbus.dto.request.StationRequestDTO;
 import com.example.waterbus.entity.Station;
 import com.example.waterbus.service.StationService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/stations")
@@ -30,7 +26,6 @@ public class StationController {
         return ResponseEntity.ok(stationService.getStationById(id));
     }
 
-
     @PostMapping
     Station addStation(@RequestBody StationRequestDTO dto){
         return stationService.addStation(dto);
@@ -42,15 +37,13 @@ public class StationController {
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
-
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteStation(@PathVariable Long id) {
         if (stationService.deleteStation(id)) {
-            return ResponseEntity.noContent().build(); // 204 No Content
+            return ResponseEntity.noContent().build();
         }
-        return ResponseEntity.notFound().build(); // 404 Not Found
+        return ResponseEntity.notFound().build();
     }
-
 }
 
 
