@@ -1,7 +1,7 @@
 package com.example.waterbus.controller.admin;
 
-import com.example.waterbus.dto.request.StationRequestDTO;
-import com.example.waterbus.entity.Station;
+import com.example.waterbus.model.req.StationReq;
+import com.example.waterbus.domain.Station;
 import com.example.waterbus.service.StationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,16 +27,17 @@ public class StationController {
     }
 
     @PostMapping
-    Station addStation(@RequestBody StationRequestDTO dto){
+    Station addStation(@RequestBody StationReq dto){
         return stationService.addStation(dto);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Station> updateStation(@PathVariable Long id, @RequestBody StationRequestDTO dto) {
+    public ResponseEntity<Station> updateStation(@PathVariable Long id, @RequestBody StationReq dto) {
         return stationService.updateStation(id, dto)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteStation(@PathVariable Long id) {
         if (stationService.deleteStation(id)) {

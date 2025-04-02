@@ -1,7 +1,7 @@
 package com.example.waterbus.service;
 
-import com.example.waterbus.dto.request.StationRequestDTO;
-import com.example.waterbus.entity.Station;
+import com.example.waterbus.model.req.StationReq;
+import com.example.waterbus.domain.Station;
 import com.example.waterbus.exception.StationNotFoundException;
 import com.example.waterbus.repository.StationRepository;
 import org.springframework.stereotype.Service;
@@ -27,7 +27,7 @@ public class StationService {
                 .orElseThrow(() -> new StationNotFoundException(id));
     }
 
-    public Optional<Station> updateStation(Long id, StationRequestDTO dto) {
+    public Optional<Station> updateStation(Long id, StationReq dto) {
         return stationRepository.findById(id).map(station -> {
             station.setName(dto.getName());
             station.setAddress(dto.getAddress());
@@ -37,7 +37,7 @@ public class StationService {
         });
     }
 
-    public Station addStation(StationRequestDTO dto) {
+    public Station addStation(StationReq dto) {
         System.out.println("Received DTO: " + dto);
 
         Station station = new Station();

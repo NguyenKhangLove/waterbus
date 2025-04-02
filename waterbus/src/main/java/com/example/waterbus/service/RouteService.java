@@ -1,6 +1,6 @@
 package com.example.waterbus.service;
 
-import com.example.waterbus.entity.Route;
+import com.example.waterbus.domain.Route;
 import com.example.waterbus.repository.RouteRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;

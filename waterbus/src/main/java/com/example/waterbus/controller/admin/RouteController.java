@@ -1,8 +1,7 @@
 package com.example.waterbus.controller.admin;
 
-import com.example.waterbus.entity.Route;
+import com.example.waterbus.domain.Route;
 import com.example.waterbus.service.RouteService;
-import com.example.waterbus.service.StationService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

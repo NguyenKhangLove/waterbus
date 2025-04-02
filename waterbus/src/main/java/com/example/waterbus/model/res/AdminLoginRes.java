@@ -1,11 +1,11 @@
-package com.example.waterbus.dto.response;
+package com.example.waterbus.model.res;
 
 import lombok.Builder;
 import lombok.Data;
 
 @Data
 @Builder
-public class AdminLoginResponse {
+public class AdminLoginRes {
     private String username;
     private String role;
 }

@@ -1,7 +1,6 @@
-package com.example.waterbus.entity;
+package com.example.waterbus.domain;
 
 import jakarta.persistence.*;
-import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.Getter;
 import lombok.Setter;
 

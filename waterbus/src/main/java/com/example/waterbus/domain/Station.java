@@ -1,19 +1,19 @@
-package com.example.waterbus.entity;
+package com.example.waterbus.domain;
 
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "ship")
+@Table(name = "station")
 @Getter
 @Setter
-public class Ship {
+public class Station {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
-    private String registrationNumber;
-    private Integer seatCapacity;
-    private String status;
+    private String address;
+    private Integer orderNumber;
+    private Integer  status;
 }

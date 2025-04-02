@@ -1,9 +1,9 @@
-package com.example.waterbus.dto.request;
+package com.example.waterbus.model.req;
 
 import lombok.Data;
 
 @Data
-public class AdminLoginRequest {
+public class AdminLoginReq {
     private String username;
     private String password;
 }

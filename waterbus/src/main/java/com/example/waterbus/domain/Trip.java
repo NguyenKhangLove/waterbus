@@ -1,4 +1,4 @@
-package com.example.waterbus.entity;
+package com.example.waterbus.domain;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -24,5 +24,19 @@ public class Trip {
     private String status;
     private String cancelReason;
     private LocalTime cancelTime;
+
+    public enum TripStatus {
+        PENDING("Đang chờ"),
+        IN_PROGRESS("Đang đi"),
+        COMPLETED("Hoàn thành"),
+        CANCELLED("Hủy");
+        private final String status;
+        TripStatus(String status) {
+            this.status = status;
+        }
+        public String getStatus() {
+            return status;
+        }
+    }
 }
 
