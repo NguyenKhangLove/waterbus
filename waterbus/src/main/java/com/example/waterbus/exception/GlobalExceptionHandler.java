@@ -1,5 +1,6 @@
 package com.example.waterbus.exception;
 
+import com.example.waterbus.model.res.MessageRes;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -15,13 +16,17 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(LoginException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<String> handleLoginException(StationNotFoundException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    public ResponseEntity<MessageRes> handleLoginException(LoginException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(new MessageRes(ex.getMessage()));
     }
+
 
     @ExceptionHandler(ShipException.class)
     public ResponseEntity<String> handleShipAlreadyExistsException(ShipException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
+
+
 }

@@ -31,25 +31,21 @@ public class StationService {
         return stationRepository.findById(id).map(station -> {
             station.setName(dto.getName());
             station.setAddress(dto.getAddress());
-            station.setOrderNumber(dto.getOrderNumber());
             station.setStatus(dto.getStatus());
             return stationRepository.save(station);
         });
     }
 
     public Station addStation(StationReq dto) {
-        System.out.println("Received DTO: " + dto);
-
         Station station = new Station();
         station.setName(dto.getName());
         station.setAddress(dto.getAddress());
-        station.setOrderNumber(dto.getOrderNumber());
         station.setStatus(dto.getStatus());
 
         return stationRepository.save(station);
     }
 
-    public boolean deleteStation(Long id) {
+    public boolean deleteStation(Long id) {//Trang thai ngung hoat dong
         if (stationRepository.existsById(id)) {
             stationRepository.deleteById(id);
             return true;

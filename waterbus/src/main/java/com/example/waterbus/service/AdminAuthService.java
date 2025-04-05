@@ -11,17 +11,25 @@ import org.springframework.stereotype.Service;
 
 
 @Service
-@RequiredArgsConstructor
 public class AdminAuthService {
 
     private final AccountRepository accountRepository;
 
+    public AdminAuthService(AccountRepository accountRepository) {
+        this.accountRepository = accountRepository;
+    }
+
     public AdminLoginRes login(AdminLoginReq request) {
+        Account account = accountRepository.findByUsername(request.getUsername())
+                .orElseThrow(() -> new LoginException("Tên đăng nhập không tồn tại"));
 
-        Account account = accountRepository.findByUsernameAndPassword(request.getUsername(), request.getPassword())
-                .orElseThrow(() -> new LoginException("Login fail") {
-                });
-
-        return AdminLoginRes.builder().username(account.getUsername()).role(account.getRole()).build();
+        if (!account.getPassword().equals(request.getPassword())) {
+            throw new LoginException("Mật khẩu không chính xác");
+        }
+        return AdminLoginRes.builder()
+                .username(account.getUsername())
+                .role(account.getRole())
+                .build();
     }
 }
+

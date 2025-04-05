@@ -13,7 +13,9 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class TripService {
@@ -24,8 +26,13 @@ public class TripService {
     @Autowired
     private ShipRepository shipRepository;
 
-    public TripService(TripRepository tripRepository) {
+    @Autowired
+    public TripService(TripRepository tripRepository,
+                       RouteRepository routeRepository,
+                       ShipRepository shipRepository) {
         this.tripRepository = tripRepository;
+        this.routeRepository = routeRepository;
+        this.shipRepository = shipRepository;
     }
 
     public List<Trip> getAllTrips() {
@@ -82,7 +89,28 @@ public class TripService {
         return ships.stream()
                 .filter(ship -> !tripRepository.existsByShipAndDepartureDateAndDepartureTime(ship, date, time)) // Kiểm tra nếu chuyến đi không tồn tại
                 .findFirst()
-                .orElse(null); // Trả về tàu đầu tiên nếu tìm thấy, nếu không trả về null
+                .orElse(null); // Trả về tàu đầu ti ên nếu tìm thấy, nếu không trả về null
     }
+   //--------------Tim chuyen----------------------------------
 
+
+    public List<Trip> findAvailableTrips(Long startStationId, Long endStationId, LocalDate departureDate) {
+        LocalTime now = LocalTime.now();
+
+        // 1. Lấy các route có cả 2 trạm theo đúng thứ tự
+        List<Route> validRoutes = routeRepository.findRoutesWithOrderedStations(startStationId, endStationId);
+
+        if (validRoutes.isEmpty()) return Collections.emptyList();
+
+        // 2. Tìm các chuyến trong ngày
+        List<Trip> trips = tripRepository.findByRouteInAndDepartureDate(validRoutes, departureDate);
+
+        // 3. Nếu là hôm nay thì lọc giờ hiện tại
+        if (departureDate.equals(LocalDate.now())) {
+            trips = trips.stream()
+                    .filter(t -> t.getDepartureTime().isAfter(now))
+                    .collect(Collectors.toList());
+        }
+        return trips;
+    }
 }

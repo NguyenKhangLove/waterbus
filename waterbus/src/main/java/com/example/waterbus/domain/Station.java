@@ -14,6 +14,6 @@ public class Station {
     private Long id;
     private String name;
     private String address;
-    private Integer orderNumber;
+    //private Integer orderNumber;
     private Integer  status;
 }
