@@ -1,25 +1,24 @@
 package com.example.waterbus.domain;
 
 
+import com.example.waterbus.dto.req.CustomerReq;
 import jakarta.persistence.*;
 import lombok.Data;
-import java.time.LocalDate;
 
-@Data
 @Entity
-@Table(name = "staff")
-public class Staff {
-
+@Table(name = "customer")
+@Data
+public class Customer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String fullName;
-    private String identityNumber;
-    private LocalDate birthDate;
-    private String gender;
+    private Integer birthYear;
     @Column(unique = true)
     private String phone;
     @Column(unique = true)
     private String email;
-    private String address;
+    private String gender;
+    private String nationality;
+
 }

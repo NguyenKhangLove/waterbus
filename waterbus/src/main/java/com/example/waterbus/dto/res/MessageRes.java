@@ -1,4 +1,4 @@
-package com.example.waterbus.model.res;
+package com.example.waterbus.dto.res;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

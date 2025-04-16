@@ -31,8 +31,8 @@ public class RouteService {
     public Route updateRoute(Long id, Route updatedRoute) {
         return routeRepository.findById(id)
                 .map(route -> {
-                    route.setStart_point_id(updatedRoute.getStart_point_id());
-                    route.setEnd_point_id(updatedRoute.getEnd_point_id());
+                    route.setEndStationId(updatedRoute.getStartStationId());
+                    route.setEndStationId(updatedRoute.getStartStationId());
                     return routeRepository.save(route);
                 })
                 .orElseThrow(() -> new EntityNotFoundException("Không tồn tại ID: " + id));

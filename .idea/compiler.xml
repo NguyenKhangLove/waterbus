@@ -7,10 +7,11 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="hello-spring-boot" />
+        <module name="waterbus_booking" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="hello-spring-boot" target="21" />
       <module name="waterbus" target="20" />
     </bytecodeTargetLevel>
   </component>
@@ -18,6 +19,7 @@
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="hello-spring-boot" options="-parameters" />
       <module name="waterbus" options="-parameters" />
+      <module name="waterbus_booking" options="-parameters" />
     </option>
   </component>
 </project>

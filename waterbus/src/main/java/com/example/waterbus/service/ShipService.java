@@ -1,7 +1,7 @@
 package com.example.waterbus.service;
 
 import com.example.waterbus.exception.ShipException;
-import com.example.waterbus.model.req.ShipReq;
+import com.example.waterbus.dto.req.ShipReq;
 import com.example.waterbus.domain.Ship;
 import com.example.waterbus.repository.ShipRepository;
 import org.springframework.beans.factory.annotation.Autowired;

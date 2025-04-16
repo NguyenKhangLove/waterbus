@@ -14,8 +14,8 @@ public class Route {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Integer start_point_id;
-    private Integer end_point_id;
+    private Long startStationId;
+    private Long endStationId;
 
     @OneToMany(mappedBy = "route", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<RouteDetail> routeDetails;

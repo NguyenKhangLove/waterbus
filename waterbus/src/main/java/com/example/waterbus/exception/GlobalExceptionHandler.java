@@ -1,6 +1,6 @@
 package com.example.waterbus.exception;
 
-import com.example.waterbus.model.res.MessageRes;
+import com.example.waterbus.dto.res.MessageRes;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
