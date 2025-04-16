@@ -1,4 +1,4 @@
-package com.example.waterbus.model.req;
+package com.example.waterbus.dto.req;
 
 import com.example.waterbus.domain.Trip;
 import lombok.Getter;

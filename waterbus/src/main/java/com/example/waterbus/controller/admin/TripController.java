@@ -1,7 +1,7 @@
 package com.example.waterbus.controller.admin;
 
 import com.example.waterbus.domain.Trip;
-import com.example.waterbus.model.req.TripReq;
+import com.example.waterbus.dto.req.TripReq;
 import com.example.waterbus.service.TripService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

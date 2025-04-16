@@ -3,13 +3,18 @@ package com.example.waterbus.service;
 import com.example.waterbus.domain.Route;
 import com.example.waterbus.domain.Ship;
 import com.example.waterbus.domain.Trip;
-import com.example.waterbus.model.req.TripReq;
+import com.example.waterbus.dto.req.TripReq;
+import com.example.waterbus.dto.req.TripSearchReq;
+import com.example.waterbus.dto.res.TripSearchRes;
 import com.example.waterbus.repository.RouteRepository;
 import com.example.waterbus.repository.ShipRepository;
 import com.example.waterbus.repository.TripRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Date;
+import java.sql.Time;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -25,15 +30,6 @@ public class TripService {
     private  RouteRepository routeRepository;
     @Autowired
     private ShipRepository shipRepository;
-
-    @Autowired
-    public TripService(TripRepository tripRepository,
-                       RouteRepository routeRepository,
-                       ShipRepository shipRepository) {
-        this.tripRepository = tripRepository;
-        this.routeRepository = routeRepository;
-        this.shipRepository = shipRepository;
-    }
 
     public List<Trip> getAllTrips() {
         return tripRepository.findAll();
@@ -91,26 +87,35 @@ public class TripService {
                 .findFirst()
                 .orElse(null); // Trả về tàu đầu ti ên nếu tìm thấy, nếu không trả về null
     }
-   //--------------Tim chuyen----------------------------------
 
+    @Transactional(readOnly = false)
+    public List<TripSearchRes> searchTrips(TripSearchReq request) {
+        // Lấy giờ hiện tại
+        LocalTime currentTime = LocalTime.now();
 
-    public List<Trip> findAvailableTrips(Long startStationId, Long endStationId, LocalDate departureDate) {
-        LocalTime now = LocalTime.now();
+        // Gọi stored procedure
+        List<Object[]> results = tripRepository.searchTripsByStationsAndDate(
+                request.getStartStationId(),
+                request.getEndStationId(),
+                Date.valueOf(request.getDepartureDate()),
+                Time.valueOf(currentTime)
+        );
 
-        // 1. Lấy các route có cả 2 trạm theo đúng thứ tự
-        List<Route> validRoutes = routeRepository.findRoutesWithOrderedStations(startStationId, endStationId);
+        // Chuyển đổi kết quả từ Object[] sang TripSearchResponse
+        return results.stream()
+                .map(this::mapToTripSearchResponse)
+                .collect(Collectors.toList());
+    }
 
-        if (validRoutes.isEmpty()) return Collections.emptyList();
-
-        // 2. Tìm các chuyến trong ngày
-        List<Trip> trips = tripRepository.findByRouteInAndDepartureDate(validRoutes, departureDate);
-
-        // 3. Nếu là hôm nay thì lọc giờ hiện tại
-        if (departureDate.equals(LocalDate.now())) {
-            trips = trips.stream()
-                    .filter(t -> t.getDepartureTime().isAfter(now))
-                    .collect(Collectors.toList());
-        }
-        return trips;
+    private TripSearchRes mapToTripSearchResponse(Object[] result) {
+        TripSearchRes response = new TripSearchRes();
+        response.setTripId((Long) result[0]);
+        response.setDepartureDate(((Date) result[1]).toLocalDate());
+        response.setStartStation((String) result[2]);
+        response.setEndStation((String) result[3]);
+        response.setRouteId((Long) result[4]);
+        response.setStartTime(((Time) result[5]).toLocalTime());
+        response.setEndTime(((Time) result[6]).toLocalTime());
+        return response;
     }
 }

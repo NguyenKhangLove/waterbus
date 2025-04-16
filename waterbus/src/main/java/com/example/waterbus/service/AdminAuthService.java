@@ -1,11 +1,13 @@
 package com.example.waterbus.service;
 
-import com.example.waterbus.model.req.AdminLoginReq;
-import com.example.waterbus.model.res.AdminLoginRes;
+import com.example.waterbus.dto.req.AdminLoginReq;
+import com.example.waterbus.dto.res.AdminLoginRes;
 import com.example.waterbus.domain.Account;
 import com.example.waterbus.exception.LoginException;
+import com.example.waterbus.jwt.JwtUtil;
 import com.example.waterbus.repository.AccountRepository;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 
@@ -13,11 +15,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class AdminAuthService {
 
-    private final AccountRepository accountRepository;
+    @Autowired
+    private AccountRepository accountRepository;
 
-    public AdminAuthService(AccountRepository accountRepository) {
-        this.accountRepository = accountRepository;
-    }
+    @Autowired
+    private JwtUtil jwtUtil;
 
     public AdminLoginRes login(AdminLoginReq request) {
         Account account = accountRepository.findByUsername(request.getUsername())
@@ -26,10 +28,12 @@ public class AdminAuthService {
         if (!account.getPassword().equals(request.getPassword())) {
             throw new LoginException("Mật khẩu không chính xác");
         }
-        return AdminLoginRes.builder()
-                .username(account.getUsername())
-                .role(account.getRole())
-                .build();
+
+        String token = jwtUtil.generateToken(account.getUsername(), account.getRole());
+
+        return new AdminLoginRes("Đăng nhập thành công!", token);
     }
 }
+
+
 

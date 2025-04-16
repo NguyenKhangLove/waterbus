@@ -1,7 +1,7 @@
 package com.example.waterbus.controller.admin;
 
-import com.example.waterbus.model.req.AdminLoginReq;
-import com.example.waterbus.model.res.AdminLoginRes;
+import com.example.waterbus.dto.req.AdminLoginReq;
+import com.example.waterbus.dto.res.AdminLoginRes;
 import com.example.waterbus.service.AdminAuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/admin/auth")
+@RequestMapping("/api/admin")
 public class AdminAuthController {
 
     @Autowired

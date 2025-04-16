@@ -1,9 +1,8 @@
 package com.example.waterbus.controller.admin;
 
 import com.example.waterbus.domain.Ship;
-import com.example.waterbus.model.req.ShipReq;
+import com.example.waterbus.dto.req.ShipReq;
 import com.example.waterbus.service.ShipService;
-import com.example.waterbus.service.StationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

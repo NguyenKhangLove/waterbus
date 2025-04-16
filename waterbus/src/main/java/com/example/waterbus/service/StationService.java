@@ -1,6 +1,6 @@
 package com.example.waterbus.service;
 
-import com.example.waterbus.model.req.StationReq;
+import com.example.waterbus.dto.req.StationReq;
 import com.example.waterbus.domain.Station;
 import com.example.waterbus.exception.StationNotFoundException;
 import com.example.waterbus.repository.StationRepository;

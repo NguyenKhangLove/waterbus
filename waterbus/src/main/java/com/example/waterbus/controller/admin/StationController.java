@@ -1,6 +1,6 @@
 package com.example.waterbus.controller.admin;
 
-import com.example.waterbus.model.req.StationReq;
+import com.example.waterbus.dto.req.StationReq;
 import com.example.waterbus.domain.Station;
 import com.example.waterbus.service.StationService;
 import org.springframework.http.ResponseEntity;

@@ -7,7 +7,7 @@ import lombok.Setter;
 import java.time.LocalTime;
 
 @Entity
-@Table(name = "ROUTE_DETAIL")
+@Table(name = "Route_Detail")
 @Getter
 @Setter
 public class RouteDetail {
@@ -20,7 +20,7 @@ public class RouteDetail {
     private Route route;
 
     @ManyToOne
-    private Station station;//phai la odernumber
+    private Station station;
 
     @Column(name = "departure_time")
     private LocalTime departureTime;
