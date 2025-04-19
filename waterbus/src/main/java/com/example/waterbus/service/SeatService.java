@@ -1,7 +1,9 @@
 package com.example.waterbus.service;
 
+import com.example.waterbus.domain.Seat;
 import com.example.waterbus.dto.req.AvailableSeatReq;
 import com.example.waterbus.dto.res.AvailableSeatRes;
+import com.example.waterbus.dto.res.SeatRes;
 import com.example.waterbus.repository.SeatRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,5 +31,12 @@ public class SeatService {
             response.setSeatNumber((String) obj[1]);
             return response;
         }).collect(Collectors.toList());
+    }
+
+    public List<SeatRes> getSeatsByShipId(Long shipId) {
+        List<Seat> seats = seatRepository.findByShip_Id(shipId);
+        return seats.stream()
+                .map(seat -> new SeatRes(seat.getIdSeat(), seat.getSeatNumber(), seat.getShip().getId()))
+                .collect(Collectors.toList());
     }
 }

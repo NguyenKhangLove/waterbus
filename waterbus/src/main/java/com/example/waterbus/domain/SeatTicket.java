@@ -14,7 +14,6 @@ import lombok.NoArgsConstructor;
 public class SeatTicket {
     @EmbeddedId
     private SeatTicketId id;
-
     public SeatTicket(Long idSeat, Long idTicket) {
         this.id = new SeatTicketId(idSeat, idTicket);
     }
