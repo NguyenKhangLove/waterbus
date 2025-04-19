@@ -21,5 +21,4 @@ public class ShipController {
         Ship newShip = shipService.createShip(request);
         return ResponseEntity.ok(newShip);
     }
-
 }

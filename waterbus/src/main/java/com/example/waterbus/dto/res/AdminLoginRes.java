@@ -12,4 +12,6 @@ public class AdminLoginRes {
         this.message = message;
         this.token = token;
     }
+    private String role;
+    private Long id;
 }
