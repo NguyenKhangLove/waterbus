@@ -6,15 +6,19 @@ import java.util.List;
 
 @Data
 public class TicketReq {
+    private String fullname;
+    private int birthYear;
+    private String phone;
+    private String email;
+    private String nationality;
+
+    private Long startStationId;
+    private Long endStationId;
     private Long tripId;
-    private String departureDate;
-    private Integer startStationId;
-    private String startStationName;
-    private Integer endStationId;
-    private String endStationName;
-    private String departureTime;
-    private String arrivalTime;
-    private List<String> seats;
-    private CustomerReq customer;
-    private List<TicketDetailReq> ticketDetails;
+    private Long staffId;
+    private String paymentMethod;
+
+    private List<Long> seatIds; // danh sách ghế chọn
+
+    private List<TicketDetailReq> details; // có thể null nếu chỉ 1 ghế
 }

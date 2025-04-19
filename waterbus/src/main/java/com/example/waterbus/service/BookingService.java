@@ -1,19 +1,23 @@
 package com.example.waterbus.service;
 
-import com.example.waterbus.domain.Customer;
-import com.example.waterbus.domain.SeatTicket;
-import com.example.waterbus.domain.Ticket;
-import com.example.waterbus.domain.TicketDetail;
+import com.example.waterbus.domain.*;
 import com.example.waterbus.dto.req.TicketDetailReq;
 import com.example.waterbus.dto.req.TicketReq;
-import com.example.waterbus.repository.CustomerRepository;
-import com.example.waterbus.repository.TicketDetailRepository;
-import com.example.waterbus.repository.TicketRepository;
-import com.example.waterbus.repository.TicketSeatRepository;
+import com.example.waterbus.dto.res.BookingInfo;
+import com.example.waterbus.dto.res.BookingRes;
+import com.example.waterbus.repository.*;
+import com.example.waterbus.utils.QRCodeGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class BookingService {
@@ -26,38 +30,142 @@ public class BookingService {
     private TicketSeatRepository ticketSeatRepository;
     @Autowired
     private TicketDetailRepository ticketDetailRepository;
+    @Autowired
+    private CategoryRepository categoryRepository;
+    @Autowired
+    private QRCodeGenerator qrCodeGenerator;
 
-    /*public void bookTicket(TicketReq req) {
-        // 1. Lưu thông tin khách hàng
-        Customer customer = new Customer(req.getCustomer());
-        customerRepository.save(customer);
-        // 2. Tạo vé
-        Ticket ticket = new Ticket();
-        ticket.setCustomer(customer.getId());
-        ticket.setIdTrip(req.getTripId());
-        ticket.setBookingTime(LocalDateTime.now());
-        ticket.setStartStationId(req.getStartStationId());
-        ticket.setEndStationId(req.getEndStationId());
-        ticket.setDepartureTime(req.getDepartureTime());
-        ticket.setArrivalTime(req.getArrivalTime());
-        ticket.setDepartureDate(req.getDepartureDate());
-        ticketRepository.save(ticket);
+    private final Map<String, TicketReq> previewCache = new ConcurrentHashMap<>();
+    private final Map<String, BookingInfo> pendingPayments = new ConcurrentHashMap<>();
 
-        // 3. Lưu danh sách ghế
-        for (String seat : req.getSeats()) {
-            TicketSeatRepository ticketSeat = new SeatTicket(ticket(), seat);
-            ticketSeatRepository.save(ticketSeat);
+    private int calculatePrice(int birthYear) {
+        int age = LocalDateTime.now().getYear() - birthYear;
+        if (age < 5 || age > 80) return 0;
+        return 15000;
+    }
+
+    private Long getCategoryId(int birthYear) {
+        int age = LocalDate.now().getYear() - birthYear;
+        if (age < 5 || age > 80) return 1L; // miễn phí
+        return 3L; // trả tiền
+    }
+
+    public BookingRes createPreviewBooking(TicketReq req) throws Exception {
+        // Validate số lượng ghế và chi tiết
+        if (req.getSeatIds() == null || req.getSeatIds().isEmpty()) {
+            throw new IllegalArgumentException("Danh sách ghế không được để trống");
+        }
+        if (req.getSeatIds().size() > 1 &&
+                (req.getDetails() == null || req.getDetails().size() != req.getSeatIds().size())) {
+            throw new IllegalArgumentException("Số lượng chi tiết người đi phải bằng số ghế");
         }
 
-        // 4. Lưu danh sách hành khách nếu có
-        if (req.getTicketDetails() != null && !req.getTicketDetails().isEmpty()) {
-            for (TicketDetailReq dto : req.getTicketDetails()) {
+        // Tính tổng tiền
+        int totalPrice = (req.getSeatIds().size() == 1)
+                ? calculatePrice(req.getBirthYear())
+                : req.getDetails().stream().mapToInt(d -> calculatePrice(d.getBirthYear())).sum();
+
+        // Tạo mã tạm
+        String tempId = UUID.randomUUID().toString();
+
+        // Nếu thanh toán QR, tạo mã QR và lưu tạm
+        if ("QR".equals(req.getPaymentMethod())) {
+            String content = "Đặt vé: " + req.getFullname() +
+                    "\nTừ: " + req.getStartStationId() +
+                    "\nĐến: " + req.getEndStationId() +
+                    "\nGiá: " + totalPrice;
+
+            String qrContent = "Nội dung tiếng Việt có dấu: Đặt vé xe";
+            String qrCode = qrCodeGenerator.generateQRCodeImage(content, 200, 200);
+            previewCache.put(tempId, req);
+
+            return new BookingRes(null, (double) totalPrice, qrCode, tempId);
+        }
+        // Nếu thanh toán tiền mặt, lưu luôn vào database
+        else {
+            Long ticketId = bookTicketImmediately(req);
+            return new BookingRes(ticketId, (double) totalPrice, null, null);
+        }
+    }
+
+    @Transactional(readOnly = false)
+    public Long bookTicketImmediately(TicketReq req) {
+        // 1. Tạo khách hàng
+        Customer customer = new Customer();
+        customer.setFullName(req.getFullname());
+        customer.setBirthYear(req.getBirthYear());
+        customer.setPhone(req.getPhone());
+        customer.setEmail(req.getEmail());
+        customer.setNationality(req.getNationality());
+        customer = customerRepository.save(customer);
+
+        // 2. Tạo vé
+        Ticket ticket = new Ticket();
+        ticket.setCustomer(customer);
+        ticket.setStartStationId(req.getStartStationId());
+        ticket.setEndStationId(req.getEndStationId());
+        ticket.setIdTrip(req.getTripId());
+        ticket.setIdStaff(req.getStaffId());
+        ticket.setBookingTime(LocalDateTime.now());
+        ticket.setPaymentMethod(req.getPaymentMethod());
+        ticket.setSeatQuantity(req.getSeatIds().size());
+
+        // Tính tổng tiền
+        int totalPrice = (req.getSeatIds().size() == 1)
+                ? calculatePrice(req.getBirthYear())
+                : req.getDetails().stream().mapToInt(d -> calculatePrice(d.getBirthYear())).sum();
+        ticket.setPrice((double) totalPrice);
+
+        // Lưu vé
+        ticket = ticketRepository.save(ticket);
+
+        // 3. Lưu seat_ticket
+        for (Long seatId : req.getSeatIds()) {
+            ticketSeatRepository.save(new SeatTicket(seatId, ticket.getIdTicket()));
+        }
+
+        // 4. Nếu có nhiều hơn 1 ghế, lưu ticket_detail
+        if (req.getSeatIds().size() > 1) {
+            for (TicketDetailReq dto : req.getDetails()) {
                 TicketDetail detail = new TicketDetail();
-                detail.setIdDetail(ticket.getIdTicket());
+                detail.setTicket(ticket);
                 detail.setFullName(dto.getFullname());
                 detail.setBirthYear(dto.getBirthYear());
+                Category category = categoryRepository.findById(getCategoryId(dto.getBirthYear()))
+                        .orElseThrow(() -> new RuntimeException("Không tìm thấy loại vé"));
+                detail.setCategory(category);
                 ticketDetailRepository.save(detail);
             }
         }
-    }*/
+
+        return ticket.getIdTicket();
+    }
+
+    @Transactional(readOnly = false)
+    public ResponseEntity<?> confirmQrPayment(String tempId) {
+        TicketReq req = previewCache.get(tempId);
+        if (req == null) {
+            return ResponseEntity.badRequest().body("Mã đặt vé không hợp lệ hoặc đã hết hạn");
+        }
+
+        try {
+            Long ticketId = bookTicketImmediately(req);
+            previewCache.remove(tempId);
+
+            // Tính toán lại totalPrice thay vì dùng getTotalPrice()
+            int totalPrice = (req.getSeatIds().size() == 1)
+                    ? calculatePrice(req.getBirthYear())
+                    : req.getDetails().stream().mapToInt(d -> calculatePrice(d.getBirthYear())).sum();
+
+            return ResponseEntity.ok(new BookingInfo(ticketId, (double) totalPrice));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Lỗi xác nhận thanh toán: " + e.getMessage());
+        }
+    }
+
+    //***************************************************************************************************************
+
+
+
 }

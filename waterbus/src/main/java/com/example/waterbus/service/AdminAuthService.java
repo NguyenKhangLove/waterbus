@@ -32,6 +32,7 @@ public class AdminAuthService {
         String token = jwtUtil.generateToken(account.getUsername(), account.getRole());
 
         return new AdminLoginRes("Đăng nhập thành công!", token);
+
     }
 }
 
