@@ -14,4 +14,6 @@ public interface SeatRepository extends JpaRepository<Seat,Long> {
             @Param("p_start_station") Integer startStationId,
             @Param("p_end_station") Integer endStationId
     );
+
+    List<Seat> findByShip_Id(Long shipId); // dùng ship.id
 }

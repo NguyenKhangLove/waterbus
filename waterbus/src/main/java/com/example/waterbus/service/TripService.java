@@ -2,12 +2,15 @@ package com.example.waterbus.service;
 
 import com.example.waterbus.domain.Route;
 import com.example.waterbus.domain.Ship;
+import com.example.waterbus.domain.Station;
 import com.example.waterbus.domain.Trip;
 import com.example.waterbus.dto.req.TripReq;
 import com.example.waterbus.dto.req.TripSearchReq;
+import com.example.waterbus.dto.res.TripRes;
 import com.example.waterbus.dto.res.TripSearchRes;
 import com.example.waterbus.repository.RouteRepository;
 import com.example.waterbus.repository.ShipRepository;
+import com.example.waterbus.repository.StationRepository;
 import com.example.waterbus.repository.TripRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,9 +33,41 @@ public class TripService {
     private  RouteRepository routeRepository;
     @Autowired
     private ShipRepository shipRepository;
+    @Autowired
+    private StationRepository stationRepository;
 
     public List<Trip> getAllTrips() {
         return tripRepository.findAll();
+    }
+    public List<TripRes> getTripsByStatus(String status) {
+        List<Trip> trips = tripRepository.findByStatus(status);
+
+        return trips.stream()
+                .map(trip -> {
+                    Route route = trip.getRoute();
+
+                    // Lấy tên trạm từ startStationId và endStationId
+                    String startStation = stationRepository.findById(route.getStartStationId())
+                            .map(Station::getName)
+                            .orElse("Unknown Start Station");
+
+                    String endStation = stationRepository.findById(route.getEndStationId())
+                            .map(Station::getName)
+                            .orElse("Unknown End Station");
+
+                    return new TripRes(
+                            trip.getId(),
+                            trip.getDepartureTime(),
+                            startStation,
+                            endStation,
+                            route.getId(),
+                            trip.getShip().getId(),
+                            trip.getStatus(),
+                            trip.getDepartureTime(),
+                            trip.getDepartureTime().plusHours(2) // giả sử 2 tiếng
+                    );
+                })
+                .collect(Collectors.toList());
     }
     public Trip createTrip(TripReq tripReq) {
         // Lấy Route từ DB

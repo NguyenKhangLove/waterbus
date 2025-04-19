@@ -7,6 +7,8 @@ import com.example.waterbus.repository.ShipRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ShipService {
     @Autowired
@@ -24,6 +26,10 @@ public class ShipService {
         ship.setStatus(request.getStatus());
 
         return shipRepository.save(ship);
+    }
+
+    public List<Ship> getAllShips() {
+        return shipRepository.findAll();
     }
 
 

@@ -2,6 +2,7 @@ package com.example.waterbus.controller.admin;
 
 import com.example.waterbus.domain.Trip;
 import com.example.waterbus.dto.req.TripReq;
+import com.example.waterbus.dto.res.TripRes;
 import com.example.waterbus.service.TripService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +22,12 @@ public class TripController {
     @GetMapping
     public ResponseEntity<List<Trip>> getAllTrips() {
         List<Trip> trips = tripService.getAllTrips();
+        return ResponseEntity.ok(trips);
+    }
+
+    @GetMapping("/status/{status}")
+    public ResponseEntity<List<TripRes>> getTripsByStatus(@PathVariable String status) {
+        List<TripRes> trips = tripService.getTripsByStatus(status);
         return ResponseEntity.ok(trips);
     }
 
