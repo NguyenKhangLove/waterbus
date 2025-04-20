@@ -2,6 +2,7 @@ package com.example.waterbus.service;
 
 import com.example.waterbus.domain.Ticket;
 import com.example.waterbus.domain.TicketDetail;
+import com.example.waterbus.dto.res.RevenueRes;
 import com.example.waterbus.dto.res.TicketRes;
 import com.example.waterbus.repository.TicketDetailRepository;
 import com.example.waterbus.repository.TicketRepository;
@@ -62,5 +63,16 @@ public class TicketService {
                         ticket.getPaymentMethod()
                 ))
                 .collect(Collectors.toList());
+    }
+
+
+    public RevenueRes getRevenueByDay(LocalDate day) {
+        Double total = ticketRepository.getRevenueByExactDay(day);
+        return new RevenueRes(day.toString(), total != null ? total : 0.0);
+    }
+
+    public RevenueRes getRevenueByMonth(int month, int year) {
+        Double total = ticketRepository.getRevenueByExactMonth(month, year);
+        return new RevenueRes(String.format("%02d/%d", month, year), total != null ? total : 0.0);
     }
 }
