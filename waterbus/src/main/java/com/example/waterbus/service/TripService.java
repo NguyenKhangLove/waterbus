@@ -87,11 +87,17 @@ public class TripService {
         return tripRepository.save(trip);
     }
 
+    private boolean isShipAvailable(Ship ship, LocalDate date, LocalTime[] times) {
+        // Kiểm tra tàu chưa có chuyến nào trong ngày
+        return !tripRepository.existsByShipAndDepartureDate(ship, date);
+    }
+
     public List<Trip> createDailyTrips(LocalDate date) {
         List<Route> routes = routeRepository.findAll();
         List<Ship> ships = shipRepository.findAll();
         List<Trip> trips = new ArrayList<>();
 
+        // Danh sách các khung giờ khởi hành cố định
         LocalTime[] departureTimes = {
                 LocalTime.of(8, 0),
                 LocalTime.of(11, 0),
@@ -99,28 +105,42 @@ public class TripService {
                 LocalTime.of(17, 0)
         };
 
+        // Kiểm tra nếu đã có chuyến cho ngày này thì không tạo nữa
+        if (tripRepository.existsByDepartureDate(date)) {
+            throw new RuntimeException("Đã tồn tại chuyến đi cho ngày " + date);
+        }
+
+        // Đếm số lượng tàu cần thiết (2 tàu cho mỗi route)
+        if (ships.size() < routes.size() * 2) {
+            throw new RuntimeException("Không đủ tàu để tạo chuyến đi");
+        }
+
+        // Tạo chuyến đi cho mỗi route
         for (Route route : routes) {
-            for (LocalTime time : departureTimes) {
-                Ship ship = findAvailableShip(ships, date, time);
-                if (ship != null) {
-                    Trip trip = new Trip();
-                    trip.setDepartureDate(date);
-                    trip.setDepartureTime(time);
-                    trip.setRoute(route);
-                    trip.setShip(ship);
-                    trip.setStatus(Trip.TripStatus.PENDING.getStatus());
-                    trips.add(trip);
-                }
+            // Lấy 2 tàu đầu tiên chưa được sử dụng
+            List<Ship> availableShips = ships.stream()
+                    .filter(ship -> isShipAvailable(ship, date, departureTimes))
+                    .limit(2)
+                    .collect(Collectors.toList());
+
+            if (availableShips.size() < 2) {
+                throw new RuntimeException("Không đủ tàu khả dụng cho tuyến " + route.getId());
+            }
+
+            // Tạo 4 chuyến (cho 4 khung giờ) với 2 tàu luân phiên
+            for (int i = 0; i < departureTimes.length; i++) {
+                Trip trip = new Trip();
+                trip.setDepartureDate(date);
+                trip.setDepartureTime(departureTimes[i]);
+                trip.setRoute(route);
+                // Luân phiên sử dụng 2 tàu
+                trip.setShip(availableShips.get(i % 2));
+                trip.setStatus(Trip.TripStatus.PENDING.getStatus());
+                trips.add(trip);
             }
         }
 
         return tripRepository.saveAll(trips);
-    }
-    private Ship findAvailableShip(List<Ship> ships, LocalDate date, LocalTime time) {
-        return ships.stream()
-                .filter(ship -> !tripRepository.existsByShipAndDepartureDateAndDepartureTime(ship, date, time)) // Kiểm tra nếu chuyến đi không tồn tại
-                .findFirst()
-                .orElse(null); // Trả về tàu đầu ti ên nếu tìm thấy, nếu không trả về null
     }
 
     @Transactional(readOnly = false)

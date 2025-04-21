@@ -16,9 +16,14 @@ import java.util.List;
 
 @Repository
 public interface TripRepository extends JpaRepository<Trip, Long> {
-    boolean existsByShipAndDepartureDateAndDepartureTime(Ship ship, LocalDate departureDate, LocalTime departureTime);
 
-    @Procedure(procedureName = "sp_search_trip_by_station_and_date3")
+    // Kiểm tra đã tồn tại chuyến nào cho ngày này chưa
+    boolean existsByDepartureDate(LocalDate departureDate);
+
+    // Kiểm tra tàu đã có chuyến trong ngày cụ thể chưa
+    boolean existsByShipAndDepartureDate(Ship ship, LocalDate departureDate);
+
+    @Procedure(procedureName = "sp_search_trip_by_station_and_date")
     List<Object[]> searchTripsByStationsAndDate(
             @Param("p_start_station_id") Long startStationId,
             @Param("p_end_station_id") Long endStationId,
