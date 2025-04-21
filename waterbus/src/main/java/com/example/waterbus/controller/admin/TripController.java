@@ -4,6 +4,7 @@ import com.example.waterbus.domain.Trip;
 import com.example.waterbus.dto.req.TripReq;
 import com.example.waterbus.dto.res.TripRes;
 import com.example.waterbus.service.TripService;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,7 +39,21 @@ public class TripController {
     }
 
     @PostMapping("/generate-daily")
-    public ResponseEntity<List<Trip>> generateDailyTrips(@RequestParam LocalDate date) {
-        return ResponseEntity.ok(tripService.createDailyTrips(date));
+    public ResponseEntity<String> generateDailyTrips(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        try {
+            // Kiểm tra ngày không phải trong quá khứ
+            if (date.isBefore(LocalDate.now())) {
+                return ResponseEntity.badRequest().body("Không thể tạo chuyến cho ngày trong quá khứ");
+            }
+
+            // Thực hiện tạo chuyến
+            List<Trip> createdTrips = tripService.createDailyTrips(date);
+
+            // Trả về thông báo text đơn giản
+            return ResponseEntity.ok("Đã tạo thành công " + createdTrips.size() + " chuyến đi");
+        } catch (IllegalStateException e) {
+            // Xử lý các lỗi nghiệp vụ
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }

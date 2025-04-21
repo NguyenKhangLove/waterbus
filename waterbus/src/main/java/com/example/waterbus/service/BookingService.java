@@ -1,5 +1,6 @@
 package com.example.waterbus.service;
 
+import com.example.waterbus.Config.MailConfig;
 import com.example.waterbus.domain.*;
 import com.example.waterbus.dto.req.TicketDetailReq;
 import com.example.waterbus.dto.req.TicketReq;
@@ -7,14 +8,18 @@ import com.example.waterbus.dto.res.BookingInfo;
 import com.example.waterbus.dto.res.BookingRes;
 import com.example.waterbus.repository.*;
 import com.example.waterbus.utils.QRCodeGenerator;
+import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -34,6 +39,14 @@ public class BookingService {
     private CategoryRepository categoryRepository;
     @Autowired
     private QRCodeGenerator qrCodeGenerator;
+    @Autowired
+    private EmailService emailService;
+    @Autowired
+    private JavaMailSender javaMailSender;
+    @Autowired
+    private StationService stationService;
+
+
 
     private final Map<String, TicketReq> previewCache = new ConcurrentHashMap<>();
     private final Map<String, BookingInfo> pendingPayments = new ConcurrentHashMap<>();
@@ -137,7 +150,52 @@ public class BookingService {
                 ticketDetailRepository.save(detail);
             }
         }
+///*************************************************************************************************************************
+        String startStationName = stationService.getNameById(req.getStartStationId());
+        String endStationName = stationService.getNameById(req.getEndStationId());
+        String formattedTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
+        // Chuẩn bị thông tin ghế và người (nếu có nhiều ghế)
+        StringBuilder seatsDetails = new StringBuilder();
+        if (req.getSeatIds().size() == 1) {
+            // Nếu chỉ có 1 ghế, in thông tin cho khách hàng chính
+            seatsDetails.append("<tr><td><strong>Khách hàng:</strong></td><td>")
+                    .append(req.getFullname()).append(" - ").append(req.getBirthYear())
+                    .append("</td></tr>");
+        } else {
+            // Nếu có nhiều ghế, in thông tin cho từng người
+            for (TicketDetailReq dto : req.getDetails()) {
+                seatsDetails.append("<tr><td><strong>Khách hàng:</strong></td><td>")
+                        .append(dto.getFullname()).append(" - ").append(dto.getBirthYear())
+                        .append("</td></tr>");
+            }
+        }
+        // Nội dung email
+        String htmlContent = "<html><body>"
+                + "<h2 style='color: #007bff;'>Đặt vé thành công!</h2>"
+                + "<p>Xin chào <strong>" + req.getFullname() + "</strong>,</p>"
+                + "<table style='width: 100%; border: 1px solid #ddd; border-collapse: collapse;'>"
+                + "<tr><td><strong>Trạm xuất phát:</strong></td><td>" + startStationName + "</td></tr>"
+                + "<tr><td><strong>Trạm đích:</strong></td><td>" + endStationName + "</td></tr>"
+                + "<tr><td><strong>Thời gian đặt:</strong></td><td>" + formattedTime + "</td></tr>"
+                + seatsDetails.toString()
+                + "<tr><td><strong>TỔNG TIỀN:</strong></td><td>" + totalPrice + " VND</td></tr>"
+                + "</table>"  // <-- tổng tiền nằm trong bảng
+                + "<p style='font-size: 0.8em;'>Đây là email tự động. Vui lòng không trả lời.</p>"  // phía sau bảng
+                + "</body></html>";
+         // Gửi email
+        try {
+            MimeMessage message = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            helper.setTo(req.getEmail());
+            helper.setSubject("Thông báo đặt vé thành công!");
+            helper.setText(htmlContent, true);  // true để chỉ định nội dung là HTML
+            javaMailSender.send(message);
+
+        } catch (Exception e) {
+            System.err.println("Lỗi khi gửi email: " + e.getMessage());
+        }
+//*******************************************************************************************************************************
         return ticket.getIdTicket();
     }
 
@@ -164,7 +222,7 @@ public class BookingService {
         }
     }
 
-    //***************************************************************************************************************
+    //********************************************************************************************************************
 
 
 

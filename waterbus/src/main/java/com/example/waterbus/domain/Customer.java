@@ -14,9 +14,7 @@ public class Customer {
     private Long id;
     private String fullName;
     private Integer birthYear;
-    @Column(unique = true)
     private String phone;
-    @Column(unique = true)
     private String email;
     private String gender;
     private String nationality;
