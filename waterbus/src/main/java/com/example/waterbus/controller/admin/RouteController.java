@@ -1,6 +1,7 @@
 package com.example.waterbus.controller.admin;
 
 import com.example.waterbus.domain.Route;
+import com.example.waterbus.dto.res.RouteInfoRes;
 import com.example.waterbus.service.RouteService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -24,8 +25,9 @@ public class RouteController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Route> getRouteById(@PathVariable Long id) {
-        return ResponseEntity.ok(routeService.getRouteById(id));
+    public ResponseEntity<RouteInfoRes> getRouteInfo(@PathVariable Long id) {
+        RouteInfoRes info = routeService.getRouteInfo(id);
+        return ResponseEntity.ok(info);
     }
 
     @PostMapping

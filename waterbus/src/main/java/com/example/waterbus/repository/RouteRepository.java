@@ -23,4 +23,6 @@ public interface RouteRepository extends JpaRepository<Route,Long> {
             @Param("endStationId") Long endStationId
     );
 
+    Optional<Route> findById(Long id);
+
 }
