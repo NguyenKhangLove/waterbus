@@ -8,6 +8,7 @@ import java.time.LocalTime;
 @Data
 public class TripSearchRes {
     private Long tripId;
+    private Long shipId;
     private LocalDate departureDate;
     private String startStation;
     private String endStation;

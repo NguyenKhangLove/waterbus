@@ -1,5 +1,6 @@
 package com.example.waterbus.dto.req;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.time.LocalDate;
@@ -8,5 +9,6 @@ import java.time.LocalDate;
 public class TripSearchReq {
     private Long startStationId;
     private Long endStationId;
-    private LocalDate departureDate;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    private LocalDate departureDate; // Sử dụng LocalDate thay vì String hoặc Date
 }

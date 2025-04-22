@@ -145,18 +145,19 @@ public class TripService {
 
     @Transactional(readOnly = false)
     public List<TripSearchRes> searchTrips(TripSearchReq request) {
-        // Lấy giờ hiện tại
-        LocalTime currentTime = LocalTime.now();
+        // Validate input
+        if (request.getDepartureDate() == null) {
+            throw new IllegalArgumentException("Departure date is required");
+        }
 
-        // Gọi stored procedure
         List<Object[]> results = tripRepository.searchTripsByStationsAndDate(
                 request.getStartStationId(),
                 request.getEndStationId(),
-                Date.valueOf(request.getDepartureDate()),
-                Time.valueOf(currentTime)
+                request.getDepartureDate(), // giữ nguyên LocalDate
+                Time.valueOf(LocalTime.now())
         );
 
-        // Chuyển đổi kết quả từ Object[] sang TripSearchResponse
+
         return results.stream()
                 .map(this::mapToTripSearchResponse)
                 .collect(Collectors.toList());
@@ -165,12 +166,13 @@ public class TripService {
     private TripSearchRes mapToTripSearchResponse(Object[] result) {
         TripSearchRes response = new TripSearchRes();
         response.setTripId((Long) result[0]);
-        response.setDepartureDate(((Date) result[1]).toLocalDate());
-        response.setStartStation((String) result[2]);
-        response.setEndStation((String) result[3]);
-        response.setRouteId((Long) result[4]);
-        response.setStartTime(((Time) result[5]).toLocalTime());
-        response.setEndTime(((Time) result[6]).toLocalTime());
+        response.setShipId((Long) result[1]);
+        response.setDepartureDate(((Date) result[2]).toLocalDate());
+        response.setStartStation((String) result[3]);
+        response.setEndStation((String) result[4]);
+        response.setRouteId((Long) result[5]);
+        response.setStartTime(((Time) result[6]).toLocalTime());
+        response.setEndTime(((Time) result[7]).toLocalTime());
         return response;
     }
 }
