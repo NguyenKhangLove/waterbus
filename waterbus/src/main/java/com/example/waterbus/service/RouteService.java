@@ -1,7 +1,10 @@
 package com.example.waterbus.service;
 
 import com.example.waterbus.domain.Route;
+import com.example.waterbus.domain.Station;
+import com.example.waterbus.dto.res.RouteInfoRes;
 import com.example.waterbus.repository.RouteRepository;
+import com.example.waterbus.repository.StationRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -10,11 +13,11 @@ import java.util.List;
 
 @Service
 public class RouteService {
-    private final RouteRepository routeRepository;
     @Autowired
-    public RouteService(RouteRepository routeRepository) {
-        this.routeRepository = routeRepository;
-    }
+    private  RouteRepository routeRepository;
+    @Autowired
+    private StationRepository stationRepository;
+
 
     public List<Route> getAllRoutes() {
         return routeRepository.findAll();
@@ -42,5 +45,18 @@ public class RouteService {
             throw new EntityNotFoundException("Không tồn tại ID: " + id);
         }
         routeRepository.deleteById(id);
+    }
+
+    public RouteInfoRes getRouteInfo(Long routeId) {
+        Route route = routeRepository.findById(routeId)
+                .orElseThrow(() -> new RuntimeException("Route not found"));
+
+        Station startStation = stationRepository.findById(route.getStartStationId())
+                .orElseThrow(() -> new RuntimeException("Start station not found"));
+
+        Station endStation = stationRepository.findById(route.getEndStationId())
+                .orElseThrow(() -> new RuntimeException("End station not found"));
+
+        return new RouteInfoRes(startStation.getName(), endStation.getName());
     }
 }
