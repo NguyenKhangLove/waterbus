@@ -32,6 +32,21 @@ public class ShipService {
         return shipRepository.findAll();
     }
 
+    public void deleteShip(Long id) {
+        shipRepository.deleteById(id);
+    }
+
+    public Ship updateShip(Long id, Ship updatedShip) {
+        return shipRepository.findById(id).map(ship -> {
+            ship.setName(updatedShip.getName());
+            ship.setRegistrationNumber(updatedShip.getRegistrationNumber());
+            ship.setSeatCapacity(updatedShip.getSeatCapacity());
+            ship.setStatus(updatedShip.getStatus());
+            return shipRepository.save(ship);
+        }).orElseThrow(() -> new RuntimeException("Không tìm thấy tàu có ID: " + id));
+    }
+
+
 
 
 
