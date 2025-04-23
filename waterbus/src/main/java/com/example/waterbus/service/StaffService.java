@@ -50,5 +50,26 @@ public class StaffService {
 
         return dto;
     }
+
+    public Staff addStaff(Staff staff) {
+        return staffRepository.save(staff);
+    }
+
+    public Staff updateStaff(Long id, Staff updated) {
+        return staffRepository.findById(id).map(staff -> {
+            staff.setFullName(updated.getFullName());
+            staff.setIdentityNumber(updated.getIdentityNumber());
+            staff.setBirthDate(updated.getBirthDate());
+            staff.setGender(updated.getGender());
+            staff.setPhone(updated.getPhone());
+            staff.setEmail(updated.getEmail());
+            staff.setAddress(updated.getAddress());
+            return staffRepository.save(staff);
+        }).orElseThrow(() -> new RuntimeException("Không tìm thấy nhân viên ID: " + id));
+    }
+
+    public void deleteStaff(Long id) {
+        staffRepository.deleteById(id);
+    }
 }
 

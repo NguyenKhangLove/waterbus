@@ -37,4 +37,14 @@ public class ShipController {
         List<SeatRes> seats = seatService.getSeatsByShipId(shipId);
         return ResponseEntity.ok(seats);
     }
+
+    @DeleteMapping("/{id}")
+    public void deleteShip(@PathVariable Long id) {
+        shipService.deleteShip(id);
+    }
+
+    @PutMapping("/{id}")
+    public Ship updateShip(@PathVariable Long id, @RequestBody Ship ship) {
+        return shipService.updateShip(id, ship);
+    }
 }

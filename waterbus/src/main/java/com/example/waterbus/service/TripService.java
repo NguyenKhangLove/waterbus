@@ -175,4 +175,22 @@ public class TripService {
         response.setEndTime(((Time) result[7]).toLocalTime());
         return response;
     }
+
+
+    public Trip cancelTrip(Long id, String reason) {
+        return tripRepository.findById(id).map(trip -> {
+            trip.setStatus(Trip.TripStatus.CANCELLED.name()); // "CANCELLED"
+            trip.setCancelReason(reason);
+            trip.setCancelTime(LocalTime.now());
+            return tripRepository.save(trip);
+        }).orElseThrow(() -> new RuntimeException("Không tìm thấy chuyến đi với ID: " + id));
+    }
+
+    public Trip completeTrip(Long id) {
+        return tripRepository.findById(id).map(trip -> {
+            trip.setStatus(Trip.TripStatus.COMPLETED.name()); // hoặc dùng getStatus() nếu lưu tiếng Việt
+            return tripRepository.save(trip);
+        }).orElseThrow(() -> new RuntimeException("Không tìm thấy chuyến đi với ID: " + id));
+    }
+
 }

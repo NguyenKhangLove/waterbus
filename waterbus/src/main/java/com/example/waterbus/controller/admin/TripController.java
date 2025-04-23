@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/trips")
@@ -56,4 +57,16 @@ public class TripController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    @PatchMapping("/{id}")
+    public Trip cancelTrip(@PathVariable Long id, @RequestBody Map<String, String> body) {
+        String reason = body.get("reason");
+        return tripService.cancelTrip(id, reason);
+    }
+
+    @PatchMapping("/{id}/complete")
+    public Trip completeTrip(@PathVariable Long id) {
+        return tripService.completeTrip(id);
+    }
+
 }
