@@ -165,12 +165,12 @@ public class TripService {
 
     private TripSearchRes mapToTripSearchResponse(Object[] result) {
         TripSearchRes response = new TripSearchRes();
-        response.setTripId((Long) result[0]);
-        response.setShipId((Long) result[1]);
+        response.setTripId(((Number) result[0]).longValue()); // Xử lý cả Integer và Long
+        response.setShipId(((Number) result[1]).longValue());
         response.setDepartureDate(((Date) result[2]).toLocalDate());
         response.setStartStation((String) result[3]);
         response.setEndStation((String) result[4]);
-        response.setRouteId((Long) result[5]);
+        response.setRouteId(((Number) result[5]).longValue()); // Xử lý cả Integer và Long
         response.setStartTime(((Time) result[6]).toLocalTime());
         response.setEndTime(((Time) result[7]).toLocalTime());
         return response;

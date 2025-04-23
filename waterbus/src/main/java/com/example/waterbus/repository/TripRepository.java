@@ -29,7 +29,6 @@ public interface TripRepository extends JpaRepository<Trip, Long> {
             @Param("p_end_station_id") Long endStationId,
             @Param("p_departure_date") LocalDate departureDate, // <-- đổi sang LocalDate
             @Param("p_time") Time currentTime);
-
     List<Trip> findByStatus(String status);
 }
 

@@ -3,10 +3,12 @@ package com.example.waterbus.repository;
 import com.example.waterbus.domain.Ticket;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.query.Procedure;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,4 +23,11 @@ public interface TicketRepository extends JpaRepository<Ticket,Long> {
     Double getRevenueByExactMonth(@Param("month") int month, @Param("year") int year);
 
     Optional<Ticket> findById(Long id);
+
+    @Query(value = "CALL sp_get_start_time(:p_trip_id, :p_start_station_id, :p_end_station_id)", nativeQuery = true)
+    LocalTime getStartTime(
+            @Param("p_trip_id") Long tripId,
+            @Param("p_start_station_id") Long startStationId,
+            @Param("p_end_station_id") Long endStationId
+    );
 }
