@@ -9,6 +9,7 @@ import com.example.waterbus.dto.res.BookingRes;
 import com.example.waterbus.repository.*;
 import com.example.waterbus.utils.QRCodeGenerator;
 import jakarta.mail.internet.MimeMessage;
+import org.hibernate.query.sql.internal.ParameterRecognizerImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,10 +20,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 @Service
 public class BookingService {
@@ -40,11 +44,13 @@ public class BookingService {
     @Autowired
     private QRCodeGenerator qrCodeGenerator;
     @Autowired
-    private EmailService emailService;
-    @Autowired
     private JavaMailSender javaMailSender;
     @Autowired
     private StationService stationService;
+    @Autowired
+    private SeatRepository seatRepository;
+    @Autowired
+    private TripRepository tripRepository;
 
 
 
@@ -151,6 +157,26 @@ public class BookingService {
             }
         }
 ///*************************************************************************************************************************
+        // Lấy giờ khởi hành bằng stored procedure
+        LocalTime startTime = ticketRepository.getStartTime(
+                req.getTripId(),
+                req.getStartStationId(),
+                req.getEndStationId()
+        );
+        // Lấy tên tàu - số hiệu tàu
+        Trip trip = tripRepository.findById(req.getTripId())
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy chuyến đi"));
+        Ship ship = trip.getShip();
+        String shipInfo = ship.getName() + " - " + ship.getRegistrationNumber();
+
+        // Lấy danh sách số ghế
+        List<Seat> seats = seatRepository.findAllById(req.getSeatIds());
+        String seatNumbers = seats.stream()
+                .map(Seat::getSeatNumber)
+                .collect(Collectors.joining(", "));
+
+        String formattedStartTime = startTime.format(DateTimeFormatter.ofPattern("HH:mm"));
+
         String startStationName = stationService.getNameById(req.getStartStationId());
         String endStationName = stationService.getNameById(req.getEndStationId());
         String formattedTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
@@ -178,6 +204,9 @@ public class BookingService {
                 + "<tr><td><strong>Trạm xuất phát:</strong></td><td>" + startStationName + "</td></tr>"
                 + "<tr><td><strong>Trạm đích:</strong></td><td>" + endStationName + "</td></tr>"
                 + "<tr><td><strong>Thời gian đặt:</strong></td><td>" + formattedTime + "</td></tr>"
+                + "<tr><td><strong>Giờ khởi hành:</strong></td><td>" + formattedStartTime + "</td></tr>"
+                + "<tr><td><strong>Số ghế:</strong></td><td>" + seatNumbers + "</td></tr>"
+                + "<tr><td><strong>Tàu:</strong></td><td>" + shipInfo + "</td></tr>"
                 + seatsDetails.toString()
                 + "<tr><td><strong>TỔNG TIỀN:</strong></td><td>" + totalPrice + " VND</td></tr>"
                 + "</table>"  // <-- tổng tiền nằm trong bảng

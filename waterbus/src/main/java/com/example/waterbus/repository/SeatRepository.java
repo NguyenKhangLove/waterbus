@@ -16,4 +16,5 @@ public interface SeatRepository extends JpaRepository<Seat,Long> {
     );
 
     List<Seat> findByShip_Id(Long shipId); // dùng ship.id
+
 }

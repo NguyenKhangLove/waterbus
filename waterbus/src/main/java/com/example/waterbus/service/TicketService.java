@@ -32,19 +32,29 @@ public class TicketService {
         List<Ticket> tickets = ticketRepository.findAll();
 
         return tickets.stream()
-                .map(ticket -> new TicketRes(
-                        ticket.getIdTicket(),
-                        ticket.getCustomer().getId(),
-                        ticket.getCustomer().getFullName(),
-                        ticket.getStartStationId(),
-                        ticket.getEndStationId(),
-                        ticket.getIdStaff(),
-                        ticket.getIdTrip(),
-                        ticket.getBookingTime(),
-                        ticket.getPrice(),
-                        ticket.getSeatQuantity(),
-                        ticket.getPaymentMethod()
-                ))
+                .map(ticket -> {
+                    // Gọi stored procedure để lấy giờ khởi hành
+                    LocalTime startDepartureTime = ticketRepository.getStartTime(
+                            ticket.getIdTrip(),
+                            ticket.getStartStationId(),
+                            ticket.getEndStationId()
+                    );
+
+                    return new TicketRes(
+                            ticket.getIdTicket(),
+                            ticket.getCustomer().getId(),
+                            ticket.getCustomer().getFullName(),
+                            ticket.getStartStationId(),
+                            ticket.getEndStationId(),
+                            ticket.getIdStaff(),
+                            ticket.getIdTrip(),
+                            ticket.getBookingTime(),
+                            ticket.getPrice(),
+                            ticket.getSeatQuantity(),
+                            ticket.getPaymentMethod(),
+                            startDepartureTime // Thêm giờ khởi hành vào response
+                    );
+                })
                 .collect(Collectors.toList());
     }
 
@@ -55,19 +65,28 @@ public class TicketService {
         List<Ticket> tickets = ticketRepository.findAllByBookingTimeBetween(startOfDay, endOfDay);
 
         return tickets.stream()
-                .map(ticket -> new TicketRes(
-                        ticket.getIdTicket(),
-                        ticket.getCustomer().getId(),
-                        ticket.getCustomer().getFullName(),
-                        ticket.getStartStationId(),
-                        ticket.getEndStationId(),
-                        ticket.getIdStaff(),
-                        ticket.getIdTrip(),
-                        ticket.getBookingTime(),
-                        ticket.getPrice(),
-                        ticket.getSeatQuantity(),
-                        ticket.getPaymentMethod()
-                ))
+                .map(ticket -> {
+                    // Gọi stored procedure để lấy giờ khởi hành
+                    LocalTime startDepartureTime = ticketRepository.getStartTime(
+                            ticket.getIdTrip(),
+                            ticket.getStartStationId(),
+                            ticket.getEndStationId()
+                    );
+                    return new TicketRes(
+                            ticket.getIdTicket(),
+                            ticket.getCustomer().getId(),
+                            ticket.getCustomer().getFullName(),
+                            ticket.getStartStationId(),
+                            ticket.getEndStationId(),
+                            ticket.getIdStaff(),
+                            ticket.getIdTrip(),
+                            ticket.getBookingTime(),
+                            ticket.getPrice(),
+                            ticket.getSeatQuantity(),
+                            ticket.getPaymentMethod(),
+                            startDepartureTime  // Thêm giờ khởi hành
+                    );
+                })
                 .collect(Collectors.toList());
     }
 
