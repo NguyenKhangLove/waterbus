@@ -175,6 +175,11 @@ public class BookingService {
                 .map(Seat::getSeatNumber)
                 .collect(Collectors.joining(", "));
 
+        // Lấy ngày khởi hành từ Trip
+        LocalDate departureDate = trip.getDepartureDate();
+        String formattedDepartureDate = departureDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+
+
         String formattedStartTime = startTime.format(DateTimeFormatter.ofPattern("HH:mm"));
 
         String startStationName = stationService.getNameById(req.getStartStationId());
@@ -205,6 +210,7 @@ public class BookingService {
                 + "<tr><td><strong>Trạm đích:</strong></td><td>" + endStationName + "</td></tr>"
                 + "<tr><td><strong>Thời gian đặt:</strong></td><td>" + formattedTime + "</td></tr>"
                 + "<tr><td><strong>Giờ khởi hành:</strong></td><td>" + formattedStartTime + "</td></tr>"
+                + "<tr><td><strong>Ngày khởi hành:</strong></td><td>" + formattedDepartureDate + "</td></tr>"
                 + "<tr><td><strong>Số ghế:</strong></td><td>" + seatNumbers + "</td></tr>"
                 + "<tr><td><strong>Tàu:</strong></td><td>" + shipInfo + "</td></tr>"
                 + seatsDetails.toString()
