@@ -3,12 +3,14 @@ package com.example.waterbus.service;
 import com.example.waterbus.domain.Customer;
 import com.example.waterbus.domain.Ticket;
 import com.example.waterbus.domain.TicketDetail;
+import com.example.waterbus.domain.Trip;
 import com.example.waterbus.dto.res.RevenueRes;
 import com.example.waterbus.dto.res.TicketInfoRes;
 import com.example.waterbus.dto.res.TicketRes;
 import com.example.waterbus.repository.SeatTicketRepository;
 import com.example.waterbus.repository.TicketDetailRepository;
 import com.example.waterbus.repository.TicketRepository;
+import com.example.waterbus.repository.TripRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +29,8 @@ public class TicketService {
     private TicketDetailRepository ticketDetailRepository;
     @Autowired
     private SeatTicketRepository seatTicketRepository;
+    @Autowired
+    private TripRepository tripRepository;
 
     public List<TicketRes> getAllTickets() {
         List<Ticket> tickets = ticketRepository.findAll();
@@ -39,6 +43,9 @@ public class TicketService {
                             ticket.getStartStationId(),
                             ticket.getEndStationId()
                     );
+                    // Lấy thông tin chuyến đi (Trip)
+                    Trip trip = tripRepository.findById(ticket.getIdTrip()).orElse(null);
+                    LocalDate departureDate = (trip != null) ? trip.getDepartureDate() : null;
 
                     return new TicketRes(
                             ticket.getIdTicket(),
@@ -52,7 +59,8 @@ public class TicketService {
                             ticket.getPrice(),
                             ticket.getSeatQuantity(),
                             ticket.getPaymentMethod(),
-                            startDepartureTime // Thêm giờ khởi hành vào response
+                            startDepartureTime,
+                            departureDate
                     );
                 })
                 .collect(Collectors.toList());
@@ -72,6 +80,11 @@ public class TicketService {
                             ticket.getStartStationId(),
                             ticket.getEndStationId()
                     );
+
+                    // Lấy thông tin chuyến đi (Trip)
+                    Trip trip = tripRepository.findById(ticket.getIdTrip()).orElse(null);
+                    LocalDate departureDate = (trip != null) ? trip.getDepartureDate() : null;
+
                     return new TicketRes(
                             ticket.getIdTicket(),
                             ticket.getCustomer().getId(),
@@ -84,7 +97,8 @@ public class TicketService {
                             ticket.getPrice(),
                             ticket.getSeatQuantity(),
                             ticket.getPaymentMethod(),
-                            startDepartureTime  // Thêm giờ khởi hành
+                            startDepartureTime,
+                            departureDate
                     );
                 })
                 .collect(Collectors.toList());

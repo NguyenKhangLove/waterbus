@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
@@ -22,5 +23,6 @@ public class TicketRes {
     private Double price;
     private Integer seatQuantity;
     private String paymentMethod;
-    private LocalTime startDepartureTime; // Thêm trường mới
+    private LocalTime startDepartureTime;
+    private LocalDate departureDate;
 }
