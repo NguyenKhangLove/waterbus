@@ -1,16 +1,10 @@
 package com.example.waterbus.service;
 
-import com.example.waterbus.domain.Customer;
-import com.example.waterbus.domain.Ticket;
-import com.example.waterbus.domain.TicketDetail;
-import com.example.waterbus.domain.Trip;
+import com.example.waterbus.entity.*;
 import com.example.waterbus.dto.res.RevenueRes;
 import com.example.waterbus.dto.res.TicketInfoRes;
 import com.example.waterbus.dto.res.TicketRes;
-import com.example.waterbus.repository.SeatTicketRepository;
-import com.example.waterbus.repository.TicketDetailRepository;
-import com.example.waterbus.repository.TicketRepository;
-import com.example.waterbus.repository.TripRepository;
+import com.example.waterbus.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +13,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,29 +26,32 @@ public class TicketService {
     private SeatTicketRepository seatTicketRepository;
     @Autowired
     private TripRepository tripRepository;
+    @Autowired
+    private StaffRepository staffRepository;
 
     public List<TicketRes> getAllTickets() {
         List<Ticket> tickets = ticketRepository.findAll();
 
         return tickets.stream()
                 .map(ticket -> {
-                    // Gọi stored procedure để lấy giờ khởi hành
                     LocalTime startDepartureTime = ticketRepository.getStartTime(
                             ticket.getIdTrip(),
                             ticket.getStartStationId(),
                             ticket.getEndStationId()
                     );
-                    // Lấy thông tin chuyến đi (Trip)
+
                     Trip trip = tripRepository.findById(ticket.getIdTrip()).orElse(null);
                     LocalDate departureDate = (trip != null) ? trip.getDepartureDate() : null;
 
+                    Staff staff = staffRepository.findById(ticket.getIdStaff()).orElse(null);
+                    String staffName = (staff != null) ? staff.getFullName() : "N/A";
+
                     return new TicketRes(
                             ticket.getIdTicket(),
-                            ticket.getCustomer().getId(),
                             ticket.getCustomer().getFullName(),
                             ticket.getStartStationId(),
                             ticket.getEndStationId(),
-                            ticket.getIdStaff(),
+                            staffName,
                             ticket.getIdTrip(),
                             ticket.getBookingTime(),
                             ticket.getPrice(),
@@ -62,8 +60,7 @@ public class TicketService {
                             startDepartureTime,
                             departureDate
                     );
-                })
-                .collect(Collectors.toList());
+                }).collect(Collectors.toList());
     }
 
     public List<TicketRes> getTicketsByDate(LocalDate date) {
@@ -74,24 +71,24 @@ public class TicketService {
 
         return tickets.stream()
                 .map(ticket -> {
-                    // Gọi stored procedure để lấy giờ khởi hành
                     LocalTime startDepartureTime = ticketRepository.getStartTime(
                             ticket.getIdTrip(),
                             ticket.getStartStationId(),
                             ticket.getEndStationId()
                     );
 
-                    // Lấy thông tin chuyến đi (Trip)
                     Trip trip = tripRepository.findById(ticket.getIdTrip()).orElse(null);
                     LocalDate departureDate = (trip != null) ? trip.getDepartureDate() : null;
 
+                    Staff staff = staffRepository.findById(ticket.getIdStaff()).orElse(null);
+                    String staffName = (staff != null) ? staff.getFullName() : "N/A";
+
                     return new TicketRes(
                             ticket.getIdTicket(),
-                            ticket.getCustomer().getId(),
                             ticket.getCustomer().getFullName(),
                             ticket.getStartStationId(),
                             ticket.getEndStationId(),
-                            ticket.getIdStaff(),
+                            staffName,
                             ticket.getIdTrip(),
                             ticket.getBookingTime(),
                             ticket.getPrice(),
@@ -140,6 +137,18 @@ public class TicketService {
 
             return responses;
         }
+    }
+
+    public Double getTotalIncome() {
+        return Optional.ofNullable(ticketRepository.getTotalIncome()).orElse(0.0);
+    }
+
+    public Double getIncomeByDate(LocalDate date) {
+        return Optional.ofNullable(ticketRepository.getIncomeByDate(date)).orElse(0.0);
+    }
+
+    public Double getIncomeByMonth(int year, int month) {
+        return Optional.ofNullable(ticketRepository.getIncomeByMonth(year, month)).orElse(0.0);
     }
 
 }

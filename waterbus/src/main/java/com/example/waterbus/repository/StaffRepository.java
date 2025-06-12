@@ -1,7 +1,6 @@
 package com.example.waterbus.repository;
 
-import com.example.waterbus.domain.Account;
-import com.example.waterbus.domain.Staff;
+import com.example.waterbus.entity.Staff;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

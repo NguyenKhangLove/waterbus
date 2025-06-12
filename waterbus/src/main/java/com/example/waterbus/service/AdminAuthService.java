@@ -2,12 +2,11 @@ package com.example.waterbus.service;
 
 import com.example.waterbus.dto.req.AdminLoginReq;
 import com.example.waterbus.dto.res.AdminLoginRes;
-import com.example.waterbus.domain.Account;
+import com.example.waterbus.entity.Account;
 import com.example.waterbus.exception.LoginException;
 import com.example.waterbus.jwt.JwtUtil;
 import com.example.waterbus.repository.AccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 
@@ -35,7 +34,7 @@ public class AdminAuthService {
                 .message("Đăng nhập thành công!")
                 .token(token)
                 .role(account.getRole())
-                .id(account.getId())
+                .id(account.getStaff().getId())//chỗ này
                 .build();
 
     }

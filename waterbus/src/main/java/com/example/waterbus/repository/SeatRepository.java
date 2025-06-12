@@ -1,6 +1,6 @@
 package com.example.waterbus.repository;
 
-import com.example.waterbus.domain.Seat;
+import com.example.waterbus.entity.Seat;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.query.Procedure;
 import org.springframework.data.repository.query.Param;

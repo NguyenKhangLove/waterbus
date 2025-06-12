@@ -1,9 +1,14 @@
 package com.example.waterbus.controller.admin;
 
-import com.example.waterbus.domain.Trip;
+import com.example.waterbus.entity.Route;
+import com.example.waterbus.entity.Station;
+import com.example.waterbus.entity.Trip;
 import com.example.waterbus.dto.req.TripReq;
 import com.example.waterbus.dto.res.TripRes;
+import com.example.waterbus.repository.StationRepository;
+import com.example.waterbus.repository.TripRepository;
 import com.example.waterbus.service.TripService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,27 +16,67 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/trips")
 public class TripController {
     private final TripService tripService;
 
+    @Autowired
+    private  TripRepository tripRepository;
+    @Autowired
+    private StationRepository stationRepository;
+
+
+
     public TripController(TripService tripService) {
         this.tripService = tripService;
     }
 
+
+
     @GetMapping
-    public ResponseEntity<List<Trip>> getAllTrips() {
-        List<Trip> trips = tripService.getAllTrips();
-        return ResponseEntity.ok(trips);
+    public ResponseEntity<List<TripRes>> getTrips(
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+
+        List<Trip> trips;
+
+        if ((status == null || status.isBlank()) && date == null) {
+            trips = tripRepository.findAll();
+        } else if (status != null && date == null) {
+            trips = tripRepository.findByStatus(status);
+        } else if (status == null && date != null) {
+            trips = tripRepository.findByDepartureDate(date);
+        } else {
+            trips = tripRepository.findByStatusAndDepartureDate(status, date);
+        }
+
+        List<TripRes> result = trips.stream().map(trip -> {
+            Route route = trip.getRoute();
+            String startStation = stationRepository.findById(route.getStartStationId())
+                    .map(Station::getName).orElse("Unknown Start");
+            String endStation = stationRepository.findById(route.getEndStationId())
+                    .map(Station::getName).orElse("Unknown End");
+
+            return new TripRes(
+                    trip.getId(),
+                    trip.getDepartureTime(),
+                    startStation,
+                    endStation,
+                    route.getId(),
+                    trip.getShip().getId(),
+                    trip.getStatus(),
+                    trip.getDepartureTime(),
+                    trip.getDepartureTime().plusHours(2)
+            );
+        }).collect(Collectors.toList());
+
+        return ResponseEntity.ok(result);
     }
 
-    @GetMapping("/status/{status}")
-    public ResponseEntity<List<TripRes>> getTripsByStatus(@PathVariable String status) {
-        List<TripRes> trips = tripService.getTripsByStatus(status);
-        return ResponseEntity.ok(trips);
-    }
+
 
     @PostMapping
     public ResponseEntity<Trip> createTrip(@RequestBody TripReq tripReq) {
@@ -59,14 +104,15 @@ public class TripController {
     }
 
     @PatchMapping("/{id}")
-    public Trip cancelTrip(@PathVariable Long id, @RequestBody Map<String, String> body) {
+    public ResponseEntity<String> cancelTrip(@PathVariable Long id, @RequestBody Map<String, String> body) {
         String reason = body.get("reason");
-        return tripService.cancelTrip(id, reason);
+        tripService.cancelTrip(id, reason);
+        return ResponseEntity.ok("Hủy thành công");
     }
+
 
     @PatchMapping("/{id}/complete")
     public Trip completeTrip(@PathVariable Long id) {
         return tripService.completeTrip(id);
     }
-
 }

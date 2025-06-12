@@ -8,10 +8,6 @@ import lombok.Data;
 public class AdminLoginRes {
     private String message;
     private String token;
-    /*public AdminLoginRes(String message, String token) {
-        this.message = message;
-        this.token = token;
-    }*/
     private String role;
     private Long id;
 }

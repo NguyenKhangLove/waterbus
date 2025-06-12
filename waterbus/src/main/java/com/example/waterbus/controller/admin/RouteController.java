@@ -1,6 +1,6 @@
 package com.example.waterbus.controller.admin;
 
-import com.example.waterbus.domain.Route;
+import com.example.waterbus.entity.Route;
 import com.example.waterbus.dto.res.RouteInfoRes;
 import com.example.waterbus.service.RouteService;
 import jakarta.persistence.EntityNotFoundException;

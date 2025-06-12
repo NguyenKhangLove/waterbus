@@ -1,14 +1,9 @@
 package com.example.waterbus.controller.admin;
 
-import com.example.waterbus.domain.Ticket;
-import com.example.waterbus.domain.TicketDetail;
-import com.example.waterbus.dto.res.RevenueRes;
-import com.example.waterbus.dto.res.TicketInfoRes;
-import com.example.waterbus.dto.res.TicketPriceRes;
-import com.example.waterbus.dto.res.TicketRes;
+import com.example.waterbus.dto.res.*;
+import com.example.waterbus.repository.TicketRepository;
 import com.example.waterbus.service.TicketPriceService;
 import com.example.waterbus.service.TicketService;
-import org.hibernate.query.sql.internal.ParameterRecognizerImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -26,31 +21,28 @@ public class TicketController {
     @Autowired
     private TicketPriceService ticketPriceService;
 
+    @Autowired
+    private TicketRepository ticketRepository;
+
     @GetMapping
     public ResponseEntity<List<TicketRes>> getAllTickets() {
         List<TicketRes> tickets = ticketService.getAllTickets();
         return ResponseEntity.ok(tickets);
     }
 
-    @GetMapping("/date")
-    public ResponseEntity<List<TicketRes>> getTicketsByDate(@RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        List<TicketRes> tickets = ticketService.getTicketsByDate(date);
-        return ResponseEntity.ok(tickets);
+    @GetMapping("/total")
+    public ResponseEntity<Double> getTotalIncome() {
+        return ResponseEntity.ok(ticketService.getTotalIncome());
     }
 
-    // Thống kê theo ngày cụ thể
     @GetMapping("/day")
-    public ResponseEntity<RevenueRes> getRevenueByDay(
-            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        return ResponseEntity.ok(ticketService.getRevenueByDay(date));
+    public ResponseEntity<Double> getIncomeByDate(@RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        return ResponseEntity.ok(ticketService.getIncomeByDate(date));
     }
 
-    // Thống kê theo tháng cụ thể
     @GetMapping("/month")
-    public ResponseEntity<RevenueRes> getRevenueByMonth(
-            @RequestParam("month") int month,
-            @RequestParam("year") int year) {
-        return ResponseEntity.ok(ticketService.getRevenueByMonth(month, year));
+    public ResponseEntity<Double> getIncomeByMonth(@RequestParam int year, @RequestParam int month) {
+        return ResponseEntity.ok(ticketService.getIncomeByMonth(year, month));
     }
 
     @GetMapping("details/{id}")
@@ -71,5 +63,17 @@ public class TicketController {
     public ResponseEntity<TicketPriceRes> getTicketPriceByCategory(@PathVariable Long idCategory) {
         TicketPriceRes priceRes = ticketPriceService.getTicketPriceByCategory(idCategory);
         return ResponseEntity.ok(priceRes);
+    }
+
+    @GetMapping("/stats/month")
+    public List<TicketStatsDTO> getMonthlyStats() {
+        return ticketRepository.getMonthlyTicketStats();
+    }
+
+
+    @GetMapping("/latest")
+    public ResponseEntity<Double> getLatestPrice(@RequestParam Long categoryId) {
+        Double price = ticketPriceService.getLatestPriceByCategoryId(categoryId);
+        return ResponseEntity.ok(price);
     }
 }

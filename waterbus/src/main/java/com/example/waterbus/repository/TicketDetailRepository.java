@@ -1,6 +1,6 @@
 package com.example.waterbus.repository;
 
-import com.example.waterbus.domain.TicketDetail;
+import com.example.waterbus.entity.TicketDetail;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

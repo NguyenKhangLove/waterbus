@@ -1,7 +1,7 @@
 package com.example.waterbus.service;
 
-import com.example.waterbus.domain.Route;
-import com.example.waterbus.domain.Station;
+import com.example.waterbus.entity.Route;
+import com.example.waterbus.entity.Station;
 import com.example.waterbus.dto.res.RouteInfoRes;
 import com.example.waterbus.repository.RouteRepository;
 import com.example.waterbus.repository.StationRepository;

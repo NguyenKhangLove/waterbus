@@ -1,7 +1,6 @@
-package com.example.waterbus.domain;
+package com.example.waterbus.entity;
 
 
-import com.example.waterbus.dto.req.CustomerReq;
 import jakarta.persistence.*;
 import lombok.Data;
 

@@ -1,6 +1,6 @@
 package com.example.waterbus.service;
 
-import com.example.waterbus.domain.Staff;
+import com.example.waterbus.entity.Staff;
 import com.example.waterbus.dto.res.StaffRes;
 import com.example.waterbus.repository.StaffRepository;
 import org.springframework.beans.factory.annotation.Autowired;
