@@ -13,11 +13,10 @@ import java.time.LocalTime;
 @NoArgsConstructor
 public class TicketRes {
     private Long idTicket;
-    private Long customerId;
     private String customerName;
     private Long startStationId;
     private Long endStationId;
-    private Long idStaff;
+    private String staffName;
     private Long idTrip;
     private LocalDateTime bookingTime;
     private Double price;

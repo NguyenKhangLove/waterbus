@@ -1,6 +1,6 @@
 package com.example.waterbus.controller.admin;
 
-import com.example.waterbus.domain.Staff;
+import com.example.waterbus.entity.Staff;
 import com.example.waterbus.dto.res.StaffRes;
 import com.example.waterbus.service.StaffService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,9 +26,11 @@ public class StaffController {
     }
 
     @PostMapping
-    public Staff addStaff(@RequestBody Staff staff) {
-        return staffService.addStaff(staff);
+    public ResponseEntity<String> addStaff(@RequestBody Staff staff) {
+        staffService.addStaff(staff);
+        return ResponseEntity.ok("Thêm thành công");
     }
+
 
     @PutMapping("/{id}")
     public Staff update(@PathVariable Long id, @RequestBody Staff updated) {
@@ -36,8 +38,10 @@ public class StaffController {
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
+    public ResponseEntity<String> delete(@PathVariable Long id) {
         staffService.deleteStaff(id);
+        return ResponseEntity.ok("Xoá thành công");
     }
+
 
 }

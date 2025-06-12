@@ -1,4 +1,4 @@
-package com.example.waterbus.domain;
+package com.example.waterbus.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;

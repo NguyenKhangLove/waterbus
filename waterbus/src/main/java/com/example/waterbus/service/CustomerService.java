@@ -1,6 +1,6 @@
 package com.example.waterbus.service;
 
-import com.example.waterbus.domain.Customer;
+import com.example.waterbus.entity.Customer;
 import com.example.waterbus.repository.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

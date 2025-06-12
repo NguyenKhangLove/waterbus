@@ -1,7 +1,7 @@
 package com.example.waterbus.controller.admin;
 
 import com.example.waterbus.dto.req.StationReq;
-import com.example.waterbus.domain.Station;
+import com.example.waterbus.entity.Station;
 import com.example.waterbus.service.StationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

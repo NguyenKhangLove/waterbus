@@ -1,7 +1,6 @@
 package com.example.waterbus.controller.admin;
 
-import com.example.waterbus.domain.Seat;
-import com.example.waterbus.domain.Ship;
+import com.example.waterbus.entity.Ship;
 import com.example.waterbus.dto.req.ShipReq;
 import com.example.waterbus.dto.res.SeatRes;
 import com.example.waterbus.service.SeatService;

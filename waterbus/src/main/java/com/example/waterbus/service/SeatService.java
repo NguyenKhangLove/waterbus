@@ -1,6 +1,6 @@
 package com.example.waterbus.service;
 
-import com.example.waterbus.domain.Seat;
+import com.example.waterbus.entity.Seat;
 import com.example.waterbus.dto.req.AvailableSeatReq;
 import com.example.waterbus.dto.res.AvailableSeatRes;
 import com.example.waterbus.dto.res.SeatRes;

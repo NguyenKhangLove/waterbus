@@ -10,5 +10,5 @@ public class TripSearchReq {
     private Long startStationId;
     private Long endStationId;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private LocalDate departureDate; // Sử dụng LocalDate thay vì String hoặc Date
+    private LocalDate departureDate;
 }

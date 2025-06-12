@@ -1,7 +1,7 @@
 package com.example.waterbus.controller.admin;
 
 
-import com.example.waterbus.domain.Customer;
+import com.example.waterbus.entity.Customer;
 import com.example.waterbus.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

@@ -59,6 +59,4 @@ public class CustomerTripController {
         return bookingService.confirmQrPayment(tempId);
     }
 
-
-
 }

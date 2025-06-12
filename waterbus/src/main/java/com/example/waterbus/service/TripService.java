@@ -1,9 +1,9 @@
 package com.example.waterbus.service;
 
-import com.example.waterbus.domain.Route;
-import com.example.waterbus.domain.Ship;
-import com.example.waterbus.domain.Station;
-import com.example.waterbus.domain.Trip;
+import com.example.waterbus.entity.Route;
+import com.example.waterbus.entity.Ship;
+import com.example.waterbus.entity.Station;
+import com.example.waterbus.entity.Trip;
 import com.example.waterbus.dto.req.TripReq;
 import com.example.waterbus.dto.req.TripSearchReq;
 import com.example.waterbus.dto.res.TripRes;
@@ -21,7 +21,6 @@ import java.sql.Time;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -107,8 +106,7 @@ public class TripService {
 
         // Kiểm tra nếu đã có chuyến cho ngày này thì không tạo nữa
         if (tripRepository.existsByDepartureDate(date)) {
-            throw new RuntimeException("Đã tồn tại chuyến đi cho ngày " + date);
-        }
+            throw new IllegalStateException("Đã tồn tại chuyến đi cho ngày " + date);        }
 
         // Đếm số lượng tàu cần thiết (2 tàu cho mỗi route)
         if (ships.size() < routes.size() * 2) {
@@ -135,7 +133,7 @@ public class TripService {
                 trip.setRoute(route);
                 // Luân phiên sử dụng 2 tàu
                 trip.setShip(availableShips.get(i % 2));
-                trip.setStatus(Trip.TripStatus.PENDING.getStatus());
+                trip.setStatus(Trip.TripStatus.PENDING.name()); // Lưu "PENDING"
                 trips.add(trip);
             }
         }
@@ -188,7 +186,7 @@ public class TripService {
 
     public Trip completeTrip(Long id) {
         return tripRepository.findById(id).map(trip -> {
-            trip.setStatus(Trip.TripStatus.COMPLETED.name()); // hoặc dùng getStatus() nếu lưu tiếng Việt
+            trip.setStatus(Trip.TripStatus.COMPLETED.name());
             return tripRepository.save(trip);
         }).orElseThrow(() -> new RuntimeException("Không tìm thấy chuyến đi với ID: " + id));
     }

@@ -1,7 +1,6 @@
 package com.example.waterbus.service;
 
-import com.example.waterbus.Config.MailConfig;
-import com.example.waterbus.domain.*;
+import com.example.waterbus.entity.*;
 import com.example.waterbus.dto.req.TicketDetailReq;
 import com.example.waterbus.dto.req.TicketReq;
 import com.example.waterbus.dto.res.BookingInfo;
@@ -9,7 +8,6 @@ import com.example.waterbus.dto.res.BookingRes;
 import com.example.waterbus.repository.*;
 import com.example.waterbus.utils.QRCodeGenerator;
 import jakarta.mail.internet.MimeMessage;
-import org.hibernate.query.sql.internal.ParameterRecognizerImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -52,10 +50,7 @@ public class BookingService {
     @Autowired
     private TripRepository tripRepository;
 
-
-
     private final Map<String, TicketReq> previewCache = new ConcurrentHashMap<>();
-    private final Map<String, BookingInfo> pendingPayments = new ConcurrentHashMap<>();
 
     private int calculatePrice(int birthYear) {
         int age = LocalDateTime.now().getYear() - birthYear;
@@ -66,7 +61,7 @@ public class BookingService {
     private Long getCategoryId(int birthYear) {
         int age = LocalDate.now().getYear() - birthYear;
         if (age < 5 || age > 80) return 1L; // miễn phí
-        return 3L; // trả tiền
+        return 3L; // trả tiền5
     }
 
     public BookingRes createPreviewBooking(TicketReq req) throws Exception {

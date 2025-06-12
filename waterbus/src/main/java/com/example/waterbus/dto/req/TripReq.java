@@ -1,6 +1,6 @@
 package com.example.waterbus.dto.req;
 
-import com.example.waterbus.domain.Trip;
+import com.example.waterbus.entity.Trip;
 import lombok.Getter;
 import lombok.Setter;
 
