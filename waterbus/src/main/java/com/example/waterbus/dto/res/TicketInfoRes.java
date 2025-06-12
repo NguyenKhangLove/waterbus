@@ -13,4 +13,6 @@ public class TicketInfoRes {
     private String fullName;
     private Integer birthYear;
     private List<Long> seatIds;
+    private List<String> seatNumbers; //Thêm danh sách số ghế
+
 }
