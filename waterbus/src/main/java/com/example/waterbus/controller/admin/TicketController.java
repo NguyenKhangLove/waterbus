@@ -1,6 +1,8 @@
 package com.example.waterbus.controller.admin;
 
 import com.example.waterbus.dto.res.*;
+import com.example.waterbus.entity.TicketDetail;
+import com.example.waterbus.repository.TicketDetailRepository;
 import com.example.waterbus.repository.TicketRepository;
 import com.example.waterbus.service.TicketPriceService;
 import com.example.waterbus.service.TicketService;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/tickets")
@@ -24,11 +27,22 @@ public class TicketController {
     @Autowired
     private TicketRepository ticketRepository;
 
+    @Autowired
+    private TicketDetailRepository ticketDetailRepository;
+
     @GetMapping
     public ResponseEntity<List<TicketRes>> getAllTickets() {
         List<TicketRes> tickets = ticketService.getAllTickets();
         return ResponseEntity.ok(tickets);
     }
+
+    @GetMapping("/date")
+    public ResponseEntity<List<TicketRes>> getTicketsByDate(
+            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        List<TicketRes> tickets = ticketService.getTicketsByDate(date);
+        return ResponseEntity.ok(tickets);
+    }
+
 
     @GetMapping("/total")
     public ResponseEntity<Double> getTotalIncome() {
@@ -75,5 +89,21 @@ public class TicketController {
     public ResponseEntity<Double> getLatestPrice(@RequestParam Long categoryId) {
         Double price = ticketPriceService.getLatestPriceByCategoryId(categoryId);
         return ResponseEntity.ok(price);
+    }
+
+    @GetMapping("/by-type")
+    public List<Map<String, Object>> getTicketStatsByType() {
+        List<TicketDetail> allDetails = ticketDetailRepository.findAll();
+        int currentYear = LocalDate.now().getYear();
+
+        long under5 = allDetails.stream().filter(d -> currentYear - d.getBirthYear() < 5).count();
+        long over80 = allDetails.stream().filter(d -> currentYear - d.getBirthYear() > 80).count();
+        long from5To80 = allDetails.size() - under5 - over80;
+
+        return List.of(
+                Map.of("label", "Dưới 5 tuổi", "count", under5),
+                Map.of("label", "Trên 80 tuổi", "count", over80),
+                Map.of("label", "Từ 5 đến 80 tuổi", "count", from5To80)
+        );
     }
 }

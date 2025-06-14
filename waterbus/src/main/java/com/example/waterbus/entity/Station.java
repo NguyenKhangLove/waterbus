@@ -15,4 +15,5 @@ public class Station {
     private String name;
     private String address;
     private Integer  status;
+    private String status1;
 }

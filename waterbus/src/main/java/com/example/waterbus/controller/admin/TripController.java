@@ -79,9 +79,9 @@ public class TripController {
 
 
     @PostMapping
-    public ResponseEntity<Trip> createTrip(@RequestBody TripReq tripReq) {
-        Trip createdTrip = tripService.createTrip(tripReq);
-        return ResponseEntity.ok(createdTrip);
+    public ResponseEntity<?> createTrip(@RequestBody TripReq request) {
+        tripService.createTrip(request);
+        return ResponseEntity.ok("Tạo chuyến đi thành công");
     }
 
     @PostMapping("/generate-daily")

@@ -1,5 +1,6 @@
 package com.example.waterbus.repository;
 
+import com.example.waterbus.entity.Category;
 import com.example.waterbus.entity.TicketPrice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -16,4 +17,7 @@ public interface TicketPriceRepository extends JpaRepository<TicketPrice,Long> {
 
     @Query("SELECT tp FROM TicketPrice tp WHERE tp.category.idCategory = :categoryId ORDER BY tp.createdDate DESC")
     List<TicketPrice> findLatestPriceByCategoryId(@Param("categoryId") Long categoryId);
+
+    TicketPrice findTopByCategoryOrderByCreatedDateDesc(Category category);
+
 }

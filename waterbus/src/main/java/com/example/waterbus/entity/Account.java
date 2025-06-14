@@ -14,6 +14,8 @@ public class Account {
     private String username;
     private String password;
     private String role;
-    @ManyToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "staff_id")
     private Staff staff;
+
 }

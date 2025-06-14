@@ -68,22 +68,21 @@ public class TripService {
                 })
                 .collect(Collectors.toList());
     }
-    public Trip createTrip(TripReq tripReq) {
-        // Lấy Route từ DB
-        Route route = routeRepository.findById(tripReq.getRouteId())
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy tuyến đường"));
-        // Lấy Ship từ DB
-        Ship ship = shipRepository.findById(tripReq.getShipId())
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy tàu"));
-        // Tạo đối tượng Trip mới
+    public void createTrip(TripReq request) {
         Trip trip = new Trip();
-        trip.setDepartureTime(tripReq.getDepartureTime());
-        trip.setDepartureDate(tripReq.getDepartureDate());
+
+        Route route = routeRepository.findById(request.getRouteId())
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy tuyến đường"));
+        Ship ship = shipRepository.findById(request.getShipId())
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy tàu"));
+
         trip.setRoute(route);
         trip.setShip(ship);
-        trip.setStatus(tripReq.getStatus() != null ? tripReq.getStatus() : Trip.TripStatus.PENDING.getStatus());
+        trip.setDepartureDate(request.getDepartureDate());
+        trip.setDepartureTime(request.getDepartureTime());
+        trip.setStatus(Trip.TripStatus.PENDING.name());
 
-        return tripRepository.save(trip);
+        tripRepository.save(trip);
     }
 
     private boolean isShipAvailable(Ship ship, LocalDate date, LocalTime[] times) {

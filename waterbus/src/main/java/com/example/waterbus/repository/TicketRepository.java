@@ -55,4 +55,7 @@ public interface TicketRepository extends JpaRepository<Ticket,Long> {
     @Query("SELECT SUM(t.price) FROM Ticket t WHERE YEAR(t.bookingTime) = :year AND MONTH(t.bookingTime) = :month")
     Double getIncomeByMonth(@Param("year") int year, @Param("month") int month);
 
+    List<Ticket> findByBookingTimeBetween(LocalDateTime start, LocalDateTime end);
+
+
 }

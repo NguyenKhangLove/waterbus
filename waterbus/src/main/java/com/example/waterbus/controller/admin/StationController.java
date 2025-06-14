@@ -1,8 +1,9 @@
 package com.example.waterbus.controller.admin;
 
-import com.example.waterbus.dto.req.StationReq;
 import com.example.waterbus.entity.Station;
+import com.example.waterbus.repository.StationRepository;
 import com.example.waterbus.service.StationService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -10,11 +11,11 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/stations")
 public class StationController {
+    @Autowired
     private  StationService stationService;
+    @Autowired
+    private StationRepository stationRepository;
 
-    public StationController(StationService stationService) {
-        this.stationService = stationService;
-    }
 
     @GetMapping
     public List<Station> getAllStations(){
@@ -27,23 +28,35 @@ public class StationController {
     }
 
     @PostMapping
-    Station addStation(@RequestBody StationReq dto){
-        return stationService.addStation(dto);
+    public Station addStation(@RequestBody Station station) {
+        station.setStatus1("Đang hoạt động");
+
+        // lưu trạm để JPA tự tạo ID
+        Station saved = stationRepository.save(station);
+        // gán status = id (sau khi đã có id)
+        saved.setStatus(saved.getId().intValue());
+        // lưu lại để cập nhật status
+        return stationRepository.save(saved);
     }
 
+    // PUT: Cập nhật trạm
     @PutMapping("/{id}")
-    public ResponseEntity<Station> updateStation(@PathVariable Long id, @RequestBody StationReq dto) {
-        return stationService.updateStation(id, dto)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+    public Station updateStation(@PathVariable Long id, @RequestBody Station updated) {
+        Station station = stationRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy trạm"));
+        station.setName(updated.getName());
+        station.setAddress(updated.getAddress());
+        return stationRepository.save(station);
     }
 
+    // DELETE (chuyển sang trạng thái ngừng hoạt động)
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteStation(@PathVariable Long id) {//Chi dc huy k dc xoa
-        if (stationService.deleteStation(id)) {
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.notFound().build();
+    public String deactivateStation(@PathVariable Long id) {
+        Station station = stationRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy trạm"));
+        station.setStatus1("Ngừng hoạt động");
+        stationRepository.save(station);
+        return "Đã chuyển sang trạng thái ngừng hoạt động";
     }
 }
 

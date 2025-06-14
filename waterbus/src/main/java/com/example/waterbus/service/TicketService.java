@@ -66,6 +66,44 @@ public class TicketService {
                 }).collect(Collectors.toList());
     }
 
+    public List<TicketRes> getTicketsByDate(LocalDate date) {
+        LocalDateTime startOfDay = date.atStartOfDay();
+        LocalDateTime endOfDay = startOfDay.plusDays(1);
+
+        List<Ticket> tickets = ticketRepository.findByBookingTimeBetween(startOfDay, endOfDay);
+
+        return tickets.stream()
+                .map(ticket -> {
+                    LocalTime startDepartureTime = ticketRepository.getStartTime(
+                            ticket.getIdTrip(),
+                            ticket.getStartStationId(),
+                            ticket.getEndStationId()
+                    );
+
+                    Trip trip = tripRepository.findById(ticket.getIdTrip()).orElse(null);
+                    LocalDate departureDate = (trip != null) ? trip.getDepartureDate() : null;
+
+                    Staff staff = staffRepository.findById(ticket.getIdStaff()).orElse(null);
+                    String staffName = (staff != null) ? staff.getFullName() : "N/A";
+
+                    return new TicketRes(
+                            ticket.getIdTicket(),
+                            ticket.getCustomer().getFullName(),
+                            ticket.getStartStationId(),
+                            ticket.getEndStationId(),
+                            staffName,
+                            ticket.getIdTrip(),
+                            ticket.getBookingTime(),
+                            ticket.getPrice(),
+                            ticket.getSeatQuantity(),
+                            ticket.getPaymentMethod(),
+                            startDepartureTime,
+                            departureDate
+                    );
+                }).collect(Collectors.toList());
+    }
+
+
 
     public List<TicketInfoRes> getTicketInfo(Long ticketId) {
         Ticket ticket = ticketRepository.findById(ticketId)

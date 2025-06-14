@@ -1,7 +1,9 @@
 package com.example.waterbus.service;
 
+import com.example.waterbus.entity.Account;
 import com.example.waterbus.entity.Staff;
 import com.example.waterbus.dto.res.StaffRes;
+import com.example.waterbus.repository.AccountRepository;
 import com.example.waterbus.repository.StaffRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,6 +15,9 @@ import java.util.List;
 public class StaffService {
     @Autowired
     private StaffRepository staffRepository;
+
+    @Autowired
+    private AccountRepository accountRepository;
 
     public List<StaffRes> getAllStaff() {
         List<Staff> staffList = staffRepository.findAll();
@@ -28,6 +33,15 @@ public class StaffService {
             dto.setPhone(staff.getPhone());
             dto.setEmail(staff.getEmail());
             dto.setAddress(staff.getAddress());
+
+            // 🔍 Tìm Account gắn với Staff này
+            Account acc = accountRepository.findByStaff(staff);
+            if (acc != null) {
+                dto.setRole(acc.getRole()); // ✅ gán role
+            } else {
+                dto.setRole("CHƯA CÓ"); // hoặc null
+            }
+
             dtoList.add(dto);
         }
 

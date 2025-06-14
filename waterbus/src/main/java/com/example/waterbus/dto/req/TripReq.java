@@ -13,5 +13,4 @@ public class TripReq {
     private LocalDate departureDate;
     private Long routeId;  // Chỉ cần ID của Route
     private Long shipId;
-    private String status = Trip.TripStatus.PENDING.getStatus(); // Mặc định là "Đang chờ"
 }

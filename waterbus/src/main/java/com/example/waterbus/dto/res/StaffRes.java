@@ -14,4 +14,6 @@ public class StaffRes {
     private String phone;
     private String email;
     private String address;
+
+    private String role;
 }
