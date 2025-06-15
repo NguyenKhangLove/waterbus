@@ -109,9 +109,9 @@ public class TripService {
             throw new IllegalStateException("Đã tồn tại chuyến đi cho ngày " + date);        }
 
         // Đếm số lượng tàu cần thiết (2 tàu cho mỗi route)
-        if (ships.size() < routes.size() * 2) {
+        /*if (ships.size() < routes.size() * 2) {
             throw new RuntimeException("Không đủ tàu để tạo chuyến đi");
-        }
+        }*/
 
         // Tạo chuyến đi cho mỗi route
         for (Route route : routes) {
@@ -121,9 +121,9 @@ public class TripService {
                     .limit(2)
                     .collect(Collectors.toList());
 
-            if (availableShips.size() < 2) {
+            /*if (availableShips.size() < 2) {
                 throw new RuntimeException("Không đủ tàu khả dụng cho tuyến " + route.getId());
-            }
+            }*/
 
             // Tạo 4 chuyến (cho 4 khung giờ) với 2 tàu luân phiên
             for (int i = 0; i < departureTimes.length; i++) {
@@ -154,8 +154,6 @@ public class TripService {
                 request.getDepartureDate(), // giữ nguyên LocalDate
                 Time.valueOf(LocalTime.now())
         );
-
-
         return results.stream()
                 .map(this::mapToTripSearchResponse)
                 .collect(Collectors.toList());

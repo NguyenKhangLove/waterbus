@@ -32,16 +32,17 @@ public interface TicketRepository extends JpaRepository<Ticket,Long> {
     );
 
     @Query("""
-        SELECT 
-            FUNCTION('day', t.bookingTime) AS day,
-            COUNT(t.idTicket) AS ticketCount
-        FROM Ticket t
-        WHERE MONTH(t.bookingTime) = MONTH(CURRENT_DATE)
-          AND YEAR(t.bookingTime) = YEAR(CURRENT_DATE)
-        GROUP BY FUNCTION('day', t.bookingTime)
-            ORDER BY FUNCTION('day', t.bookingTime)
-                  """)
-    List<TicketStatsDTO> getMonthlyTicketStats();
+    SELECT 
+        FUNCTION('day', t.bookingTime) AS day,
+        COUNT(t.idTicket) AS ticketCount
+    FROM Ticket t
+    WHERE MONTH(t.bookingTime) = :month
+      AND YEAR(t.bookingTime) = :year
+    GROUP BY FUNCTION('day', t.bookingTime)
+    ORDER BY FUNCTION('day', t.bookingTime)
+""")
+    List<TicketStatsDTO> getMonthlyTicketStats(@Param("year") int year, @Param("month") int month);
+
 
     // Tổng thu nhập tất cả
     @Query("SELECT SUM(t.price) FROM Ticket t")

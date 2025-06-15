@@ -80,9 +80,10 @@ public class TicketController {
     }
 
     @GetMapping("/stats/month")
-    public List<TicketStatsDTO> getMonthlyStats() {
-        return ticketRepository.getMonthlyTicketStats();
+    public List<TicketStatsDTO> getMonthlyStats(@RequestParam int year, @RequestParam int month) {
+        return ticketRepository.getMonthlyTicketStats(year, month);
     }
+
 
 
     @GetMapping("/latest")
