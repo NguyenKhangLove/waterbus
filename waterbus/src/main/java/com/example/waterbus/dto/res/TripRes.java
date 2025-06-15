@@ -13,6 +13,7 @@ import java.time.LocalTime;
 public class TripRes {
     private Long id;
     private LocalTime departureTime;
+    private LocalDate departureDate; //thêm dòng này
     private String startStation;
     private String endStation;
     private Long routeId;

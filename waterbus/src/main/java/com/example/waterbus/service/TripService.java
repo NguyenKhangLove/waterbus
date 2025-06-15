@@ -57,6 +57,7 @@ public class TripService {
                     return new TripRes(
                             trip.getId(),
                             trip.getDepartureTime(),
+                            trip.getDepartureDate(),
                             startStation,
                             endStation,
                             route.getId(),

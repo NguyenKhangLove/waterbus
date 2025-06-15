@@ -20,7 +20,7 @@ public class Route {
     @OneToMany(mappedBy = "route", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<RouteDetail> routeDetails;
     public List<RouteDetail> getRouteDetails() {
-        return routeDetails;
+            return routeDetails;
     }
     public void setRouteDetails(List<RouteDetail> routeDetails) {
         this.routeDetails = routeDetails;

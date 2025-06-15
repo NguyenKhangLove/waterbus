@@ -33,5 +33,9 @@ public interface TripRepository extends JpaRepository<Trip, Long> {
     List<Trip> findByDepartureDate(LocalDate departureDate);
 
     List<Trip> findByStatusAndDepartureDate(String status, LocalDate departureDate);
+
+    List<Trip> findByDepartureDateBefore(LocalDate date);
+
+
 }
 

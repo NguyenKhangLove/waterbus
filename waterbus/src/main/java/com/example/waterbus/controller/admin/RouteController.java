@@ -1,5 +1,6 @@
 package com.example.waterbus.controller.admin;
 
+import com.example.waterbus.dto.res.RouteDTO;
 import com.example.waterbus.dto.res.RouteDetailDTO;
 import com.example.waterbus.entity.Route;
 import com.example.waterbus.dto.res.RouteInfoRes;
@@ -28,8 +29,15 @@ public class RouteController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Route>> getRoutes() {
-        return ResponseEntity.ok(routeService.getAllRoutes());
+    public List<RouteDTO> getAllRoutes() {
+        return routeService.getAllRoutes();
+    }
+
+    @PostMapping
+    public ResponseEntity<?> createRoute(@RequestBody RouteDTO dto) {
+        Route saved = routeService.createRoute(dto);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new RouteDTO(saved.getId(), saved.getStartStationId(), saved.getEndStationId()));
     }
 
     @GetMapping("/{id}")
@@ -38,11 +46,6 @@ public class RouteController {
         return ResponseEntity.ok(info);
     }
 
-    @PostMapping
-    public ResponseEntity<Route> createRoute(@RequestBody Route route) {
-        Route newRoute = routeService.createRoute(route);
-        return ResponseEntity.status(HttpStatus.CREATED).body(newRoute);
-    }
 
     @PutMapping("/{id}")
     public ResponseEntity<Route> updateRoute(@PathVariable Long id, @RequestBody Route updatedRoute) {

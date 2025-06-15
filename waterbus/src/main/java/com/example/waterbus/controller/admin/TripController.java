@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -63,6 +64,7 @@ public class TripController {
             return new TripRes(
                     trip.getId(),
                     trip.getDepartureTime(),
+                    trip.getDepartureDate(), // thêm trường này
                     startStation,
                     endStation,
                     route.getId(),
@@ -115,4 +117,42 @@ public class TripController {
     public Trip completeTrip(@PathVariable Long id) {
         return tripService.completeTrip(id);
     }
+
+    @PatchMapping("/update-to-in-progress")
+    public ResponseEntity<String> updateToInProgress() {
+        LocalDate today = LocalDate.now();
+        LocalTime now = LocalTime.now();
+
+        List<Trip> trips = tripRepository.findByStatusAndDepartureDate("PENDING", today);
+        int updatedCount = 0;
+
+        for (Trip trip : trips) {
+            if (trip.getDepartureTime().isBefore(now)) {
+                trip.setStatus("IN_PROGRESS");
+                updatedCount++;
+            }
+        }
+
+        tripRepository.saveAll(trips); // lưu đồng loạt
+        return ResponseEntity.ok("Đã cập nhật " + updatedCount + " chuyến sang IN_PROGRESS.");
+    }
+
+    @PatchMapping("/auto-complete")
+    public ResponseEntity<String> autoCompleteTrips() {
+        LocalDate today = LocalDate.now();
+        List<Trip> trips = tripRepository.findByDepartureDateBefore(today);
+
+        int updatedCount = 0;
+        for (Trip trip : trips) {
+            String status = trip.getStatus();
+            if ("PENDING".equalsIgnoreCase(status) || "IN_PROGRESS".equalsIgnoreCase(status)) {
+                trip.setStatus("COMPLETED");
+                updatedCount++;
+            }
+        }
+
+        tripRepository.saveAll(trips);
+        return ResponseEntity.ok("Đã cập nhật " + updatedCount + " chuyến sang COMPLETED.");
+    }
+
 }
