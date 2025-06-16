@@ -52,11 +52,37 @@ public class BookingService {
 
     private final Map<String, TicketReq> previewCache = new ConcurrentHashMap<>();
 
+    @Autowired
+    private TicketPriceRepository ticketPriceRepo;
+
+    @Autowired
+    private CategoryRepository categoryRepo;
+
     private int calculatePrice(int birthYear) {
-        int age = LocalDateTime.now().getYear() - birthYear;
-        if (age < 5 || age > 80) return 0;
-        return 15000;
+        int age = LocalDate.now().getYear() - birthYear;
+        Long categoryId;
+
+        if (age < 5) {
+            categoryId = 1L; // Dưới 5 tuổi
+        } else if (age > 80) {
+            categoryId = 2L; // Trên 80 tuổi
+        } else {
+            categoryId = 3L; // Từ 5 đến 80 tuổi
+        }
+
+        // Tìm category theo ID
+        Category category = categoryRepo.findById(categoryId)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy categoryId: " + categoryId));
+
+        // Lấy giá mới nhất
+        TicketPrice latestPrice = ticketPriceRepo.findTopByCategoryOrderByCreatedDateDesc(category);
+        if (latestPrice == null) {
+            throw new IllegalStateException("Không có giá vé cho category: " + categoryId);
+        }
+
+        return latestPrice.getPrice().intValue(); // hoặc dùng long/double tùy hệ thống
     }
+
 
     private Long getCategoryId(int birthYear) {
         int age = LocalDate.now().getYear() - birthYear;

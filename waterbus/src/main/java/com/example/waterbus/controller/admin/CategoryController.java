@@ -2,6 +2,7 @@ package com.example.waterbus.controller.admin;
 
 
 import com.example.waterbus.dto.req.CategoryWithPriceRequest;
+import com.example.waterbus.dto.res.CategoryDTO;
 import com.example.waterbus.dto.res.CategoryWithPriceDto;
 import com.example.waterbus.entity.Category;
 import com.example.waterbus.entity.TicketPrice;
@@ -15,6 +16,8 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/categories")
@@ -29,6 +32,30 @@ public class CategoryController {
     @Autowired
     private TicketPriceRepository priceRepo;
 
+    @GetMapping
+    public List<CategoryDTO> getAllCategories() {
+        return categoryRepo.findAll().stream().map(cat -> {
+            CategoryDTO dto = new CategoryDTO();
+            dto.setIdCategory(cat.getIdCategory());
+            dto.setDescription(cat.getDescription());
+            dto.setStatus(cat.getStatus());
+            return dto;
+        }).collect(Collectors.toList());
+    }
+
+    @GetMapping("/list")
+    public List<CategoryDTO> getAllCategories1() {
+        return categoryRepo.findAll().stream()
+                .filter(cat -> !"Không áp dụng".equalsIgnoreCase(cat.getStatus())) // lọc
+                .map(cat -> {
+                    CategoryDTO dto = new CategoryDTO();
+                    dto.setIdCategory(cat.getIdCategory());
+                    dto.setDescription(cat.getDescription());
+                    dto.setStatus(cat.getStatus());
+                    return dto;
+                })
+                .collect(Collectors.toList());
+    }
 
 
     @PostMapping
@@ -55,6 +82,19 @@ public class CategoryController {
     public List<CategoryWithPriceDto> getAll() {
         return categoryService.getAllWithPrices();
     }
+
+    @PutMapping("/categories/{id}/deactivate")
+    public ResponseEntity<?> deactivateCategory(@PathVariable Long id) {
+        Optional<Category> optional = categoryRepo.findById(id);
+        if (optional.isEmpty()) return ResponseEntity.notFound().build();
+
+        Category category = optional.get();
+        category.setStatus("Không áp dụng");
+        categoryRepo.save(category);
+
+        return ResponseEntity.ok("Đã chuyển trạng thái sang 'Không áp dụng'");
+    }
+
 
     // 2. Tạo mới category
     @PostMapping("/categories")
